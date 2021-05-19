@@ -1,38 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>记录一次Hibernate一对多插入问题</title>
-    <url>/archives/start.html</url>
-    <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/1609932867.png"></p>
-<span id="more"></span>
-
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>   在一次web项目中，其场景为员工与部门的关联关系，在员工表生成一个外键对应其部门表的主键，配置的为一对多关联关系，当插入数据时却出现了员工表外键为null的情况。</p>
-<hr>
-<h2 id="员工类"><a href="#员工类" class="headerlink" title="员工类"></a>员工类</h2><p>基于hibernate注解配置，getter与setter方法不再列出，只列出了其对应字段。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Table(name=&quot;p_users&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">P_user</span> </span>&#123;</span><br><span class="line"><span class="meta">@Id</span></span><br><span class="line"><span class="meta">@GeneratedValue(generator=&quot;mygener&quot;)</span></span><br><span class="line"><span class="comment">//整长策略</span></span><br><span class="line"><span class="meta">@GenericGenerator(name=&quot;mygener&quot;,strategy=&quot;native&quot;)</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"><span class="meta">@Column(name=&quot;names&quot;,length=20,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String names;</span><br><span class="line"><span class="meta">@Column(name=&quot;sex&quot;,length=10,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String sex;</span><br><span class="line"><span class="meta">@Column(name=&quot;iphone&quot;,length=40,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String iphone;</span><br><span class="line"><span class="meta">@Column(name=&quot;email&quot;,length=45,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String email;</span><br><span class="line"><span class="meta">@Column(name=&quot;states&quot;,length=10,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String states;</span><br></pre></td></tr></table></figure>
-<h2 id="部门类"><a href="#部门类" class="headerlink" title="部门类"></a>部门类</h2><p>基于hibernate注解配置，getter与setter方法不再列出，只列出了其对应字段</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Table(name=&quot;dept&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dept</span> </span>&#123;</span><br><span class="line"><span class="meta">@Id</span></span><br><span class="line"><span class="meta">@GeneratedValue(generator=&quot;mygener&quot;)</span></span><br><span class="line"><span class="meta">@GenericGenerator(name=&quot;mygener&quot;,strategy=&quot;native&quot;)</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"><span class="meta">@Column(name=&quot;ename&quot;,length=30,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String ename;</span><br><span class="line"><span class="meta">@Column(name=&quot;datas&quot;,length=40,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String datas;</span><br><span class="line"><span class="comment">//注解配置一对多关联关系</span></span><br><span class="line"><span class="meta">@OneToMany(targetEntity=P_user.class,cascade=CascadeType.ALL)</span></span><br><span class="line"><span class="comment">//外键名称</span></span><br><span class="line"><span class="meta">@JoinColumn(name=&quot;dept_id&quot;)</span></span><br><span class="line"><span class="keyword">private</span> Set&lt;P_user&gt; puser = <span class="keyword">new</span> HashSet&lt;P_user&gt;();</span><br></pre></td></tr></table></figure>
-<h2 id="原Test测试类"><a href="#原Test测试类" class="headerlink" title="原Test测试类"></a>原Test测试类</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SessionFactory sessionFactory = SessionFacUtil.getsessionFactory();<span class="comment">//加载配置</span></span><br><span class="line">Session session = sessionFactory.openSession();<span class="comment">//创建session	</span></span><br><span class="line">Transaction tx =  session.beginTransaction();<span class="comment">//开启事务</span></span><br><span class="line">P_user user = <span class="keyword">new</span> P_user ();</span><br><span class="line">user.setNames(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line">Set&lt;P_user&gt; sets = <span class="keyword">new</span> HashSet&lt;P_user&gt;();</span><br><span class="line">sets.add(user);</span><br><span class="line"><span class="comment">//查询已有的部门</span></span><br><span class="line">Dept dept = session.get(Dept.class, <span class="number">12</span>);</span><br><span class="line"><span class="comment">//将该人员类加入到部门的set集合中，并产生外键联系</span></span><br><span class="line">dept.setUsers(sets);</span><br><span class="line">session.save(dept);</span><br><span class="line">tx.commit();</span><br><span class="line">session.close();</span><br><span class="line">sessionFactory.close();</span><br></pre></td></tr></table></figure>
-<p>运行测试无异常，查看数据库也正常插入了数据<br>数据库显示为：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/3283312814.png"></p>
-<p>可见以正常插入，并与产生了外键，可当再次运行测试类，再次插入时出现了问题，新运行的插入的插入成功了，可第一次插入的数据外键却变成了null，也就是说，只能存在这一个外键，不能有两个。<br>如图：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/3252239438.png"></p>
-<p>这就让我感到很是疑惑，一对多，由表可知，一个部门下可以有多个部门的，不应该会出现这种null的情况的，一开始以为配置的问题，检查了好多配置地方，也在网上搜寻了一大圈，最后还是无果。</p>
-<p>正当我一筹莫展的时候，突然发现了一句关键的话</p>
-<pre><code>Set&lt;P_user&gt; sets = new HashSet&lt;P_user&gt;();
-</code></pre>
-<p>没错，就是它，我怀疑是不是这个set集合的问题，每次运行new后都产生新的集合，然后再把集合加入dept中，再执行数据插入，会不会是这个的影响，于是改造了以下新的测试类</p>
-<h2 id="新Test测试类"><a href="#新Test测试类" class="headerlink" title="新Test测试类"></a>新Test测试类</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SessionFactory sessionFactory = SessionFacUtil.getsessionFactory();<span class="comment">//加载配置</span></span><br><span class="line">Session session = sessionFactory.openSession();<span class="comment">//创建session	</span></span><br><span class="line">Transaction tx =  session.beginTransaction();<span class="comment">//开启事务</span></span><br><span class="line">P_user user = <span class="keyword">new</span> P_user ();</span><br><span class="line">user.setNames(<span class="string">&quot;张三3&quot;</span>);</span><br><span class="line"><span class="comment">//查询已有的部门</span></span><br><span class="line">Dept dept = session.get(Dept.class, <span class="number">12</span>);</span><br><span class="line"><span class="comment">//将该人员类加入到该查询出来的dept的set集合中</span></span><br><span class="line">dept.getUsers().add(user);</span><br><span class="line">session.save(dept);</span><br><span class="line">tx.commit();</span><br><span class="line">session.close();</span><br><span class="line">sessionFactory.close();</span><br></pre></td></tr></table></figure>
-<p>测试结果完美通过<br>数据库截图：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/348904703.png"></p>
-<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>就是这个每次new的set集合问题，结果执行时有让数据库update的了以下，把第一次插入的数据变为了null。</p>
-<p>一次小小的细节问题，也体现出看来我对hibernate了解学习的还不够透彻，还需努力专研。</p>
-]]></content>
-      <categories>
-        <category>持久层框架</category>
-      </categories>
-      <tags>
-        <tag>Hibernate</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Spring+Struts2+Hibernate后台管理系统</title>
     <url>/archives/13.html</url>
     <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/3323727449.png"></p>
@@ -99,86 +67,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Mybatis中Mapper传入复杂性参数</title>
-    <url>/archives/39.html</url>
-    <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/3537748652.jpg"></p>
-<span id="more"></span>
-
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>近期自学了Mybatis框架，学完之后也正在着手写了一个SSM项目，在项目中使用Mybatis持久层框架时，对Mapper.XML传参数时遇到了一些小小的问题，于是在此做个笔记，加深印象。</p>
-<h2 id="Mybatis简介"><a href="#Mybatis简介" class="headerlink" title="Mybatis简介"></a>Mybatis简介</h2><p>持久层框架，是apache下的一个开源项目，使用映射方式，半自动化（需要程序员自己编写Sql语句），相比Hibernate而言学习难度小，上手快。</p>
-<h2 id="Mybatis传参类型"><a href="#Mybatis传参类型" class="headerlink" title="Mybatis传参类型"></a>Mybatis传参类型</h2><ul>
-<li>基本数据类型：int，String，Dete等</li>
-<li>复杂数据类型：Bean实体类，map</li>
-</ul>
-<h2 id="传参属性"><a href="#传参属性" class="headerlink" title="传参属性"></a>传参属性</h2><p>Mybatis中的<strong>parameterType</strong>属性</p>
-<p><em>本文主要记录传入复杂型参数中的Map</em></p>
-<h2 id="传入Map-一"><a href="#传入Map-一" class="headerlink" title="传入Map(一)"></a>传入Map(一)</h2><p><strong>Mapper.XML配置</strong></p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!--parameterType传入的类型为Map，resultType返回为一个实体类--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectUser&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;java.util.Map&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;AdminUser&quot;</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--#&#123;name&#125;花括号中的值为Map集合中的Key--&gt;</span></span><br><span class="line">SELECT  * FROM USER WHERE username = #&#123;name&#125; AND sex =#&#123;sex&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p><strong>Mapper接口</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//参数类型为Map，与Mapper.xml中的parameterType参数类型一致</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AdminUser <span class="title">selectUser</span><span class="params">(Map&lt;String, Object&gt; map)</span> <span class="keyword">throws</span> Exception</span>;</span><br></pre></td></tr></table></figure>
-<p><strong>测试类</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//定义Map集合</span></span><br><span class="line">Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</span><br><span class="line">map.put(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;张小明&quot;</span>);</span><br><span class="line">map.put(<span class="string">&quot;sex&quot;</span>, <span class="string">&quot;1&quot;</span>);</span><br><span class="line"><span class="comment">//调用dao接口，并传入Map集合</span></span><br><span class="line">对象.selectUser(map);</span><br></pre></td></tr></table></figure>
-<p><strong>测试结果截图</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/2856416609.png"><br>可见已经查询出了该条数据</p>
-<h2 id="传入Map-二"><a href="#传入Map-二" class="headerlink" title="传入Map(二)"></a>传入Map(二)</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!--parameterType传入的类型为Map，resultType返回为一个实体类--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectUser&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;java.util.Map&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;AdminUser&quot;</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--#&#123;user.username&#125;花括号中的值为User实体类中属性--&gt;</span></span><br><span class="line">SELECT  * FROM USER WHERE username = #&#123;user.username&#125; AND sex =#&#123;user.sex&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p><strong>Mapper接口</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//参数类型为User实体类，使用@Param注解的作用是给参数命名</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AdminUser <span class="title">selectUser</span><span class="params">((<span class="meta">@Param(&quot;user&quot;)</span>AdminUser adminUser)</span> <span class="keyword">throws</span> Exception</span>;</span><br></pre></td></tr></table></figure>
-<p><strong>测试类</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//定义实体类对象</span></span><br><span class="line">AdminUser u = <span class="keyword">new</span> AdminUser();</span><br><span class="line">u.setSex(<span class="string">&quot;1&quot;</span>);</span><br><span class="line">u.setUname(<span class="string">&quot;张小明&quot;</span>);</span><br><span class="line"><span class="comment">//调用接口，传入实体类对象</span></span><br><span class="line">对象.selectUser(u);</span><br></pre></td></tr></table></figure>
-<p><strong>测试结果截图</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/2856416609.png"><br>可见已经查询出了该条数据</p>
-<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>总体来说Mybatis的使用还是比较方便的，但需要对Sql语句有一定的掌握，当然也可以使用generator逆向工程生成Mapper，不过生成的代码也需要自己能够理解能够看懂，但在看懂的前提下，还是需要懂得sql语句，万变不离其宗。</p>
-]]></content>
-      <categories>
-        <category>持久层框架</category>
-      </categories>
-      <tags>
-        <tag>Mybatis</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Spring+SpringMVC+Mybatis后台管理系统</title>
-    <url>/archives/44.html</url>
-    <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/1239678965.jpg"></p>
-<span id="more"></span>
-
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>距离上一个发布的SSH项目已经有一段时间了，在完成了上一个SSH项目后，于是乎又开始SSM框架的学习，到今为止SSM框架已基本完成，同时做了一个SSM的后台管理系统，以便巩固更多知识点。</p>
-<hr>
-<h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>项目属于后台管理系统，前端样式风格还是沿用了SSH项目的前端样式（其实是不想再调试前端了，把时间放在了后端），后端使用SSM框架，前后端分离，进行CRUD操作。</p>
-<p><strong>项目模块</strong></p>
-<ul>
-<li>普通人员管理</li>
-<li>后台人员管理</li>
-<li>新闻管理</li>
-<li>资源上传</li>
-<li>资源下载</li>
-<li>类别管理</li>
-<li>部门管理</li>
-</ul>
-<p><strong>架构方式</strong><br>前后端分离，面向接口开发，三层架构，部分链接采用了RESTful风格。</p>
-<p><strong>请求方式</strong><br>Ajax异步向后台发送请求</p>
-<p><strong>数据库</strong><br>mysql关系型数据库</p>
-<p><strong>运行环境</strong><br>tomcat9.x</p>
-<p><strong>开发周期</strong><br>自学 + 做项目= 45天</p>
-<p><strong>项目结构图</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/2737441036.png"></p>
-<p><strong>项目截图</strong></p>
-<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/4235734422.png"></p>
-<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/2378386128.png"></p>
-<p><em>更多截图请点击获取项目</em></p>
-<hr>
-<h2 id="获取项目"><a href="#获取项目" class="headerlink" title="获取项目"></a>获取项目</h2><p><em>更多详情请点击获取项目</em></p>
-<p>项目获取地址：<a href="https://github.com/Snykta/admin_ssm">点击直达</a></p>
-<hr>
-<h2 id="附加"><a href="#附加" class="headerlink" title="附加"></a>附加</h2><p>SSH项目：<a href="https://www.charones.com/archives/13.html">SSH后台管理系统</a></p>
-<hr>
-<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>分享是快乐的，分享是互相进步的，如果项目存在不足缺点，还劳烦请指点迷津，学习我一直在路上，如果是对你的学习路途有了些许帮助，那就还劳烦请动动小手点个Star。</p>
-]]></content>
-      <categories>
-        <category>JavaWeb项目</category>
-      </categories>
-      <tags>
-        <tag>JavaWeb</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>IDEA中maven构建的SSM项目mapper绑定失败</title>
     <url>/archives/60.html</url>
     <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/2483435586.jpg"></p>
@@ -194,39 +82,6 @@
 <p>意思为：xml配置文件随同java编译后的class文件一同copy到相应的class目录</p>
 <p><strong>结果</strong><br>经过测试果然和我猜想的一样，最后运行成功，方法成功被调用。</p>
 <h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>eclipse编译项目会自动将xml配置文件编译进classes,IDEA却不行，看来还是对IDEA的使用不熟练，之前一直用eclipse开发，不经常用IDEA，突然换个开发工具出现了太多问题，还是不够熟练，革命还未胜利，同志还须再努力。</p>
-]]></content>
-      <categories>
-        <category>maven</category>
-      </categories>
-      <tags>
-        <tag>maven</tag>
-        <tag>IDEA</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SSM购物商城项目+后台管理</title>
-    <url>/archives/66.html</url>
-    <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/710888379.jpg"></p>
-<span id="more"></span>
-
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>以往都是使用的eclipse工具来开发项目，虽然IDEA也在使用，但使用它来开发的项目较少，前几天eclipse突然抽风了，导致项目无法进行下去，于是就打算转战IDEA，而后就有了以下这篇文章，记录IDEA下搭建Maven聚合工程。</p>
-<h2 id="项目介绍"><a href="#项目介绍" class="headerlink" title="项目介绍"></a>项目介绍</h2><p>本项目是一个分布式商城项目，用到的技术栈有：Spring，SpringMVC，Mybatis，Dubbo，Redis，FastDFS，Zookeeper，Nginx等框架，本篇文章不重点介绍此项目，<strong>主要记录IDEA下创建maven聚合项目的过程</strong>。</p>
-<h2 id="工程结构"><a href="#工程结构" class="headerlink" title="工程结构"></a>工程结构</h2><p>parent为工程的父工程，用来管理jar包的版本号，项目中所有工程都继承该父工程。</p>
-<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/1909012967.png"></p>
-<hr>
-<p><strong>开始之前先创建一个空的工程，作为整个项目的工作空间，存储项目。</strong></p>
-<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3179563415.png"><br><strong>点击next后会让输入项目名称，输完项目名称后，点击Finish后就创建完成了</strong>。</p>
-<hr>
-<h2 id="创建parent工程"><a href="#创建parent工程" class="headerlink" title="创建parent工程"></a>创建parent工程</h2><p>1、依次点击File ——&gt; New ——&gt; Module..<br><strong>如图所示：</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3229652861.png"><br>2、点击后会弹出创建工程的窗口，然后依此如图点击。</p>
-<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/2154353145.png"></p>
-<p>3、在此页面填写maven工程信息后，一直点击next直至finish。<br><strong>如图所示：</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3885920751.png"></p>
-<p>4、此时parent工程创建完毕，打开parent工程的pom.xml文件进行配置信息的修改，当然也可以删除src下的文件，因为在此就只是一个版本控制的pom工程，因此也可以删除src下的文件。<br>如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/1532921932.png"><br>在此只用了一个fastjson依赖作为了演示。<br><strong>注意：一定要修改parent工程的打包方式，在此为父工程，并作为版本依赖的控制，所以修改为pom方式。</strong></p>
-<h2 id="创建common工程"><a href="#创建common工程" class="headerlink" title="创建common工程"></a>创建common工程</h2><p>1、和创建parent工程步骤一致，一直到填写maven工程信息才有所不同，在此就不再记录了，直接记录不同之处。<br>2、填写maven信息，如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/1564926419.png"><br><strong>注意：最上面有两个选项卡，第一个选择为none，意思为不将此过程加入到parent中（因为只需要单纯的继承，所以不需要添加，聚合工程时才需要），第二个选项卡选择刚创建的parent，意思为此工程将继承parent工程。</strong><br>3、修改完毕后，点击next直至finish。<br>4、common工程创建完毕，修改pom.xml配置信息，如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3826692154.png"><br>common工程创建完毕。</p>
-<h2 id="创建manger聚合工程"><a href="#创建manger聚合工程" class="headerlink" title="创建manger聚合工程"></a>创建manger聚合工程</h2><p>1、和创建common工程步骤一致，都要继承parent工程，最后创建完毕后，把pom.xml文件的打包方式修改为pom。<br>pom文件如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/2948097408.png"><br>manger工程创建完毕</p>
-<h2 id="创建pojo子工程"><a href="#创建pojo子工程" class="headerlink" title="创建pojo子工程"></a>创建pojo子工程</h2><p>1、pojo工程为manger聚合工程下的子工程，首先点击选中manger，然后依次点击：鼠标右键——&gt; New ——&gt; Module..<br>如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/908816368.png"><br>2、点击后在弹出的创建工程上依此如图所示点击<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/292517979.png"><br>3、点击next后，如图所示配置maven工程信息<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3080248082.png"><br>4、点击next直至finish<br>5、修改pojo的pom工程文件，如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/1802667684.png"><br>6、此时pojo子工程创建完毕，这时再去查看manger聚合工程的pom文件，里面就加入一个刚创建pojo模块<br>如图：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/2810311382.png"></p>
-<hr>
-<h2 id="省略"><a href="#省略" class="headerlink" title="省略"></a>省略</h2><p><strong>剩余的dao，interface，service都属于manger聚合工程下的子工程，创建方式和pojo一致，不一致的地方就是打包方式，打包方式根据实际工程而定。</strong><br><strong>web工程不属于聚合工程下的子工程，它的创建方式就和common工程一致，但打包方式为war包，根据工程而定，选择maven工程的模板选择为：</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/2215964992.png"><br>选择webapp是因为它可以自动为你创建web.xml等文件。</p>
-<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>以上就是在IDEA工具下创建maven聚合工程的步骤，之前一直用eclipse来创建，这次eclipse抽风后，就转战IDEA了，也就算是做为一个笔记，方便日后查看。</p>
 ]]></content>
       <categories>
         <category>maven</category>
@@ -275,6 +130,71 @@
       </categories>
       <tags>
         <tag>Git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>记录一次Hibernate一对多插入问题</title>
+    <url>/archives/start.html</url>
+    <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/1609932867.png"></p>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>   在一次web项目中，其场景为员工与部门的关联关系，在员工表生成一个外键对应其部门表的主键，配置的为一对多关联关系，当插入数据时却出现了员工表外键为null的情况。</p>
+<hr>
+<h2 id="员工类"><a href="#员工类" class="headerlink" title="员工类"></a>员工类</h2><p>基于hibernate注解配置，getter与setter方法不再列出，只列出了其对应字段。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Table(name=&quot;p_users&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">P_user</span> </span>&#123;</span><br><span class="line"><span class="meta">@Id</span></span><br><span class="line"><span class="meta">@GeneratedValue(generator=&quot;mygener&quot;)</span></span><br><span class="line"><span class="comment">//整长策略</span></span><br><span class="line"><span class="meta">@GenericGenerator(name=&quot;mygener&quot;,strategy=&quot;native&quot;)</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"><span class="meta">@Column(name=&quot;names&quot;,length=20,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String names;</span><br><span class="line"><span class="meta">@Column(name=&quot;sex&quot;,length=10,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String sex;</span><br><span class="line"><span class="meta">@Column(name=&quot;iphone&quot;,length=40,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String iphone;</span><br><span class="line"><span class="meta">@Column(name=&quot;email&quot;,length=45,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String email;</span><br><span class="line"><span class="meta">@Column(name=&quot;states&quot;,length=10,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String states;</span><br></pre></td></tr></table></figure>
+<h2 id="部门类"><a href="#部门类" class="headerlink" title="部门类"></a>部门类</h2><p>基于hibernate注解配置，getter与setter方法不再列出，只列出了其对应字段</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Table(name=&quot;dept&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dept</span> </span>&#123;</span><br><span class="line"><span class="meta">@Id</span></span><br><span class="line"><span class="meta">@GeneratedValue(generator=&quot;mygener&quot;)</span></span><br><span class="line"><span class="meta">@GenericGenerator(name=&quot;mygener&quot;,strategy=&quot;native&quot;)</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"><span class="meta">@Column(name=&quot;ename&quot;,length=30,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String ename;</span><br><span class="line"><span class="meta">@Column(name=&quot;datas&quot;,length=40,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String datas;</span><br><span class="line"><span class="comment">//注解配置一对多关联关系</span></span><br><span class="line"><span class="meta">@OneToMany(targetEntity=P_user.class,cascade=CascadeType.ALL)</span></span><br><span class="line"><span class="comment">//外键名称</span></span><br><span class="line"><span class="meta">@JoinColumn(name=&quot;dept_id&quot;)</span></span><br><span class="line"><span class="keyword">private</span> Set&lt;P_user&gt; puser = <span class="keyword">new</span> HashSet&lt;P_user&gt;();</span><br></pre></td></tr></table></figure>
+<h2 id="原Test测试类"><a href="#原Test测试类" class="headerlink" title="原Test测试类"></a>原Test测试类</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SessionFactory sessionFactory = SessionFacUtil.getsessionFactory();<span class="comment">//加载配置</span></span><br><span class="line">Session session = sessionFactory.openSession();<span class="comment">//创建session	</span></span><br><span class="line">Transaction tx =  session.beginTransaction();<span class="comment">//开启事务</span></span><br><span class="line">P_user user = <span class="keyword">new</span> P_user ();</span><br><span class="line">user.setNames(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line">Set&lt;P_user&gt; sets = <span class="keyword">new</span> HashSet&lt;P_user&gt;();</span><br><span class="line">sets.add(user);</span><br><span class="line"><span class="comment">//查询已有的部门</span></span><br><span class="line">Dept dept = session.get(Dept.class, <span class="number">12</span>);</span><br><span class="line"><span class="comment">//将该人员类加入到部门的set集合中，并产生外键联系</span></span><br><span class="line">dept.setUsers(sets);</span><br><span class="line">session.save(dept);</span><br><span class="line">tx.commit();</span><br><span class="line">session.close();</span><br><span class="line">sessionFactory.close();</span><br></pre></td></tr></table></figure>
+<p>运行测试无异常，查看数据库也正常插入了数据<br>数据库显示为：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/3283312814.png"></p>
+<p>可见以正常插入，并与产生了外键，可当再次运行测试类，再次插入时出现了问题，新运行的插入的插入成功了，可第一次插入的数据外键却变成了null，也就是说，只能存在这一个外键，不能有两个。<br>如图：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/3252239438.png"></p>
+<p>这就让我感到很是疑惑，一对多，由表可知，一个部门下可以有多个部门的，不应该会出现这种null的情况的，一开始以为配置的问题，检查了好多配置地方，也在网上搜寻了一大圈，最后还是无果。</p>
+<p>正当我一筹莫展的时候，突然发现了一句关键的话</p>
+<pre><code>Set&lt;P_user&gt; sets = new HashSet&lt;P_user&gt;();
+</code></pre>
+<p>没错，就是它，我怀疑是不是这个set集合的问题，每次运行new后都产生新的集合，然后再把集合加入dept中，再执行数据插入，会不会是这个的影响，于是改造了以下新的测试类</p>
+<h2 id="新Test测试类"><a href="#新Test测试类" class="headerlink" title="新Test测试类"></a>新Test测试类</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SessionFactory sessionFactory = SessionFacUtil.getsessionFactory();<span class="comment">//加载配置</span></span><br><span class="line">Session session = sessionFactory.openSession();<span class="comment">//创建session	</span></span><br><span class="line">Transaction tx =  session.beginTransaction();<span class="comment">//开启事务</span></span><br><span class="line">P_user user = <span class="keyword">new</span> P_user ();</span><br><span class="line">user.setNames(<span class="string">&quot;张三3&quot;</span>);</span><br><span class="line"><span class="comment">//查询已有的部门</span></span><br><span class="line">Dept dept = session.get(Dept.class, <span class="number">12</span>);</span><br><span class="line"><span class="comment">//将该人员类加入到该查询出来的dept的set集合中</span></span><br><span class="line">dept.getUsers().add(user);</span><br><span class="line">session.save(dept);</span><br><span class="line">tx.commit();</span><br><span class="line">session.close();</span><br><span class="line">sessionFactory.close();</span><br></pre></td></tr></table></figure>
+<p>测试结果完美通过<br>数据库截图：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/348904703.png"></p>
+<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>就是这个每次new的set集合问题，结果执行时有让数据库update的了以下，把第一次插入的数据变为了null。</p>
+<p>一次小小的细节问题，也体现出看来我对hibernate了解学习的还不够透彻，还需努力专研。</p>
+]]></content>
+      <categories>
+        <category>持久层框架</category>
+      </categories>
+      <tags>
+        <tag>Hibernate</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSM购物商城项目+后台管理</title>
+    <url>/archives/66.html</url>
+    <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/710888379.jpg"></p>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>以往都是使用的eclipse工具来开发项目，虽然IDEA也在使用，但使用它来开发的项目较少，前几天eclipse突然抽风了，导致项目无法进行下去，于是就打算转战IDEA，而后就有了以下这篇文章，记录IDEA下搭建Maven聚合工程。</p>
+<h2 id="项目介绍"><a href="#项目介绍" class="headerlink" title="项目介绍"></a>项目介绍</h2><p>本项目是一个分布式商城项目，用到的技术栈有：Spring，SpringMVC，Mybatis，Dubbo，Redis，FastDFS，Zookeeper，Nginx等框架，本篇文章不重点介绍此项目，<strong>主要记录IDEA下创建maven聚合项目的过程</strong>。</p>
+<h2 id="工程结构"><a href="#工程结构" class="headerlink" title="工程结构"></a>工程结构</h2><p>parent为工程的父工程，用来管理jar包的版本号，项目中所有工程都继承该父工程。</p>
+<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/1909012967.png"></p>
+<hr>
+<p><strong>开始之前先创建一个空的工程，作为整个项目的工作空间，存储项目。</strong></p>
+<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3179563415.png"><br><strong>点击next后会让输入项目名称，输完项目名称后，点击Finish后就创建完成了</strong>。</p>
+<hr>
+<h2 id="创建parent工程"><a href="#创建parent工程" class="headerlink" title="创建parent工程"></a>创建parent工程</h2><p>1、依次点击File ——&gt; New ——&gt; Module..<br><strong>如图所示：</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3229652861.png"><br>2、点击后会弹出创建工程的窗口，然后依此如图点击。</p>
+<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/2154353145.png"></p>
+<p>3、在此页面填写maven工程信息后，一直点击next直至finish。<br><strong>如图所示：</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3885920751.png"></p>
+<p>4、此时parent工程创建完毕，打开parent工程的pom.xml文件进行配置信息的修改，当然也可以删除src下的文件，因为在此就只是一个版本控制的pom工程，因此也可以删除src下的文件。<br>如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/1532921932.png"><br>在此只用了一个fastjson依赖作为了演示。<br><strong>注意：一定要修改parent工程的打包方式，在此为父工程，并作为版本依赖的控制，所以修改为pom方式。</strong></p>
+<h2 id="创建common工程"><a href="#创建common工程" class="headerlink" title="创建common工程"></a>创建common工程</h2><p>1、和创建parent工程步骤一致，一直到填写maven工程信息才有所不同，在此就不再记录了，直接记录不同之处。<br>2、填写maven信息，如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/1564926419.png"><br><strong>注意：最上面有两个选项卡，第一个选择为none，意思为不将此过程加入到parent中（因为只需要单纯的继承，所以不需要添加，聚合工程时才需要），第二个选项卡选择刚创建的parent，意思为此工程将继承parent工程。</strong><br>3、修改完毕后，点击next直至finish。<br>4、common工程创建完毕，修改pom.xml配置信息，如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3826692154.png"><br>common工程创建完毕。</p>
+<h2 id="创建manger聚合工程"><a href="#创建manger聚合工程" class="headerlink" title="创建manger聚合工程"></a>创建manger聚合工程</h2><p>1、和创建common工程步骤一致，都要继承parent工程，最后创建完毕后，把pom.xml文件的打包方式修改为pom。<br>pom文件如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/2948097408.png"><br>manger工程创建完毕</p>
+<h2 id="创建pojo子工程"><a href="#创建pojo子工程" class="headerlink" title="创建pojo子工程"></a>创建pojo子工程</h2><p>1、pojo工程为manger聚合工程下的子工程，首先点击选中manger，然后依次点击：鼠标右键——&gt; New ——&gt; Module..<br>如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/908816368.png"><br>2、点击后在弹出的创建工程上依此如图所示点击<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/292517979.png"><br>3、点击next后，如图所示配置maven工程信息<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3080248082.png"><br>4、点击next直至finish<br>5、修改pojo的pom工程文件，如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/1802667684.png"><br>6、此时pojo子工程创建完毕，这时再去查看manger聚合工程的pom文件，里面就加入一个刚创建pojo模块<br>如图：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/2810311382.png"></p>
+<hr>
+<h2 id="省略"><a href="#省略" class="headerlink" title="省略"></a>省略</h2><p><strong>剩余的dao，interface，service都属于manger聚合工程下的子工程，创建方式和pojo一致，不一致的地方就是打包方式，打包方式根据实际工程而定。</strong><br><strong>web工程不属于聚合工程下的子工程，它的创建方式就和common工程一致，但打包方式为war包，根据工程而定，选择maven工程的模板选择为：</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/2215964992.png"><br>选择webapp是因为它可以自动为你创建web.xml等文件。</p>
+<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>以上就是在IDEA工具下创建maven聚合工程的步骤，之前一直用eclipse来创建，这次eclipse抽风后，就转战IDEA了，也就算是做为一个笔记，方便日后查看。</p>
+]]></content>
+      <categories>
+        <category>maven</category>
+      </categories>
+      <tags>
+        <tag>maven</tag>
+        <tag>IDEA</tag>
       </tags>
   </entry>
   <entry>
@@ -347,6 +267,53 @@
       </tags>
   </entry>
   <entry>
+    <title>Redisson实现订单超时自动关闭(高可用)</title>
+    <url>/archives/86.html</url>
+    <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/04/545024470.jpg"></p>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>艺术来源于生活，技术来源于业务，由于原业务上的需求，需要做一个用户下单后超过一定时间内没有支付自动取消订单，说白了就是一个超时自动取消的功能，这种场景恐怕是非常非常常见的一个业务需求了，在此记录下使用redis来实现此功能。</p>
+<h2 id="业务分析"><a href="#业务分析" class="headerlink" title="业务分析"></a>业务分析</h2><p>当产品经理说到超时取消时，第一时间想到的就是延迟队列，市面上也有很多常见的消息中间件，例如：RabbitMQ，RocketMQ，ActiveMQ，Kafka，Redis，ZeroMQ等等，都可以实现此功能，虽然轮子不断造，但合适自己的才是最好的。</p>
+<h2 id="技术选型"><a href="#技术选型" class="headerlink" title="技术选型"></a>技术选型</h2><p>1、RabbitMQ：一开始选中的就是它，它有一个实现延迟队列的插件，正好符合要求，但后来和技术经理沟通下，由于自身服务架构来说，此方法最终被石沉大海了，此方案被pass掉。</p>
+<p>2、Redis：第二个方案是基于Redis，使用Redis的key过期通知，在服务端捕获这个失效通知来处理业务，一开始是可行的，但后来考虑到高可用，而且当接收通知的服务宕机时，就会出现掉单，丢失消息的情况，于是此方法也被Pass掉。</p>
+<p>3、Redis+Redisson：经过几次考虑与测试后，最终使用了此技术来实现超时订单取消的功能开发。</p>
+<h2 id="技术介绍"><a href="#技术介绍" class="headerlink" title="技术介绍"></a>技术介绍</h2><blockquote>
+<p>Redisson：Redisson在基于NIO的Netty框架上，充分的利用了Redis键值数据库提供的一系列优势，在Java实用工具包中常用接口的基础上，为使用者提供了一系列具有分布式特性的常用工具类。使得原本作为协调单机多线程并发程序的工具包获得了协调分布式多机多线程并发系统的能力，大大降低了设计和研发大规模分布式系统的难度。同时结合各富特色的分布式服务，更进一步简化了分布式环境中程序相互之间的协作。</p>
+</blockquote>
+<p>中文文档：<a href="https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95">https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95</a></p>
+<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><p><strong>pom.xml依赖</strong></p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.redisson<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>redisson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.12.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Redisson的配置类：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisQueueConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 连接redis的地址</span></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;spring.redis.host&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String host;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//redis的端口号</span></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;spring.redis.port&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String port;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//redis的密码</span></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;spring.redis.password&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RedissonClient <span class="title">redissonClient</span><span class="params">()</span></span>&#123;</span><br><span class="line">       <span class="comment">//此处为单机配置，高可用配置请往下看</span></span><br><span class="line">        Config config = <span class="keyword">new</span> Config();</span><br><span class="line">        <span class="keyword">if</span> (password.equals(<span class="string">&quot;&quot;</span>))&#123;</span><br><span class="line">            config.setCodec(<span class="keyword">new</span> org.redisson.client.codec.StringCodec());</span><br><span class="line">            config.useSingleServer().setAddress(<span class="string">&quot;redis://&quot;</span> + host + <span class="string">&quot;:&quot;</span> + port).setDatabase(<span class="number">2</span>).setTimeout(<span class="number">5000</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            config.useSingleServer().setAddress(<span class="string">&quot;redis://&quot;</span> + host + <span class="string">&quot;:&quot;</span> + port).setPassword(password).setDatabase(<span class="number">2</span>).setTimeout(<span class="number">5000</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Redisson.create(config);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>伪下单代码</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> RedissonClient redissonClient;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TestController</span><span class="params">(RedissonClient redissonClient)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.redissonClient = redissonClient;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/hello&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 目标队列</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        RBlockingQueue&lt;String&gt; blockingRedPacketQueue</span><br><span class="line">                = redissonClient.getBlockingQueue(<span class="string">&quot;userOrderKey&quot;</span>);</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 定时任务将到期的元素转移到目标队列</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        RDelayedQueue&lt;String&gt; delayedRedPacketQueue</span><br><span class="line">                = redissonClient.getDelayedQueue(blockingRedPacketQueue);</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 123456代表订单号，放入队列中</span></span><br><span class="line"><span class="comment">         * 设置10秒后到期</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        delayedRedPacketQueue.offer(<span class="string">&quot;123456&quot;</span>, <span class="number">10</span>, TimeUnit.SECONDS);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;OK&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p><strong>处理超时订单代码</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AutoStart</span> <span class="keyword">implements</span> <span class="title">CommandLineRunner</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(AutoStart.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RedissonClient redissonClient;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">(String... args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        RBlockingQueue&lt;String&gt; blockingRedPacketQueue</span><br><span class="line">                = redissonClient.getBlockingQueue(<span class="string">&quot;userOrderKey&quot;</span>);</span><br><span class="line"></span><br><span class="line">        RDelayedQueue&lt;String&gt; delayedRedPacketQueue</span><br><span class="line">                = redissonClient.getDelayedQueue(blockingRedPacketQueue);</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">             * 如果当前没有失效的订单，则此循环会暂时阻塞</span></span><br><span class="line"><span class="comment">             * 取出超时订单信息</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            String redPacket = blockingRedPacketQueue.take();</span><br><span class="line">            LOGGER.info(<span class="string">&quot;订单号:&#123;&#125;过期失效&quot;</span>,redPacket);</span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">             * 处理相关业务逻辑</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="高可用配置"><a href="#高可用配置" class="headerlink" title="高可用配置"></a>高可用配置</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 主从部署方式</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Config config = <span class="keyword">new</span> Config();</span><br><span class="line">config.useMasterSlaveServers()</span><br><span class="line">        <span class="comment">//设置redis主节点</span></span><br><span class="line">        .setMasterAddress(<span class="string">&quot;redis://127.0.0.1:6379&quot;</span>)</span><br><span class="line">        <span class="comment">//设置redis从节点</span></span><br><span class="line">        .addSlaveAddress(<span class="string">&quot;redis://127.0.0.2:6379&quot;</span>, <span class="string">&quot;redis://127.0.0.3:6379&quot;</span>);</span><br><span class="line">RedissonClient redisson = Redisson.create(config);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 集群部署方式</span></span><br><span class="line"><span class="comment"> * cluster方式至少6个节点</span></span><br><span class="line"><span class="comment"> * 3主3从，3主做sharding，3从用来保证主宕机后可以高可用</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Config config = <span class="keyword">new</span> Config();</span><br><span class="line">config.useClusterServers()</span><br><span class="line">        .setScanInterval(<span class="number">2000</span>)<span class="comment">//集群状态扫描间隔时间，单位是毫秒</span></span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.1:6379&quot;</span>)</span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.2:6379&quot;</span>)</span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.3:6379&quot;</span>)</span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.4:6379&quot;</span>)</span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.5:6379&quot;</span>)</span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.6:6379&quot;</span>);</span><br><span class="line">RedissonClient redissonClient = Redisson.create(config);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 哨兵部署方式</span></span><br><span class="line"><span class="comment"> * sentinel是采用 Paxos拜占庭协议，一般sentinel至少3个节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Config config = <span class="keyword">new</span> Config();</span><br><span class="line">config.useSentinelServers()</span><br><span class="line">        .setMasterName(<span class="string">&quot;my-sentinel-name&quot;</span>)</span><br><span class="line">        .addSentinelAddress(<span class="string">&quot;redis://127.0.0.1:6379&quot;</span>)</span><br><span class="line">        .addSentinelAddress(<span class="string">&quot;redis://127.0.0.2:6379&quot;</span>)</span><br><span class="line">        .addSentinelAddress(<span class="string">&quot;redis://127.0.0.3:6379&quot;</span>);</span><br><span class="line">RedissonClient redisson = Redisson.create(config);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="运行截图"><a href="#运行截图" class="headerlink" title="运行截图"></a>运行截图</h2><p>访问hello接口后，等待10秒，控制台返回如下</p>
+<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/4118908773.png"></p>
+<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>还是那句话，技术类型越来越多，轮子不停造，选对技术合适自己业务的才是最好的，无论是JDK内置的延迟队列还是基于时间轮算法的队列，都无法保证生产系统的高可用性，而Redisson很好的解决了这个问题。</p>
+]]></content>
+      <categories>
+        <category>Redisson</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+        <tag>Redis</tag>
+        <tag>Redisson</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>SpringBoot向后台传参的若干种方式</title>
     <url>/archives/84.html</url>
     <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/11/3476319186.jpg"></p>
@@ -408,53 +375,6 @@
       </categories>
       <tags>
         <tag>SpringBoot</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redisson实现订单超时自动关闭(高可用)</title>
-    <url>/archives/86.html</url>
-    <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/04/545024470.jpg"></p>
-<span id="more"></span>
-
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>艺术来源于生活，技术来源于业务，由于原业务上的需求，需要做一个用户下单后超过一定时间内没有支付自动取消订单，说白了就是一个超时自动取消的功能，这种场景恐怕是非常非常常见的一个业务需求了，在此记录下使用redis来实现此功能。</p>
-<h2 id="业务分析"><a href="#业务分析" class="headerlink" title="业务分析"></a>业务分析</h2><p>当产品经理说到超时取消时，第一时间想到的就是延迟队列，市面上也有很多常见的消息中间件，例如：RabbitMQ，RocketMQ，ActiveMQ，Kafka，Redis，ZeroMQ等等，都可以实现此功能，虽然轮子不断造，但合适自己的才是最好的。</p>
-<h2 id="技术选型"><a href="#技术选型" class="headerlink" title="技术选型"></a>技术选型</h2><p>1、RabbitMQ：一开始选中的就是它，它有一个实现延迟队列的插件，正好符合要求，但后来和技术经理沟通下，由于自身服务架构来说，此方法最终被石沉大海了，此方案被pass掉。</p>
-<p>2、Redis：第二个方案是基于Redis，使用Redis的key过期通知，在服务端捕获这个失效通知来处理业务，一开始是可行的，但后来考虑到高可用，而且当接收通知的服务宕机时，就会出现掉单，丢失消息的情况，于是此方法也被Pass掉。</p>
-<p>3、Redis+Redisson：经过几次考虑与测试后，最终使用了此技术来实现超时订单取消的功能开发。</p>
-<h2 id="技术介绍"><a href="#技术介绍" class="headerlink" title="技术介绍"></a>技术介绍</h2><blockquote>
-<p>Redisson：Redisson在基于NIO的Netty框架上，充分的利用了Redis键值数据库提供的一系列优势，在Java实用工具包中常用接口的基础上，为使用者提供了一系列具有分布式特性的常用工具类。使得原本作为协调单机多线程并发程序的工具包获得了协调分布式多机多线程并发系统的能力，大大降低了设计和研发大规模分布式系统的难度。同时结合各富特色的分布式服务，更进一步简化了分布式环境中程序相互之间的协作。</p>
-</blockquote>
-<p>中文文档：<a href="https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95">https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95</a></p>
-<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><p><strong>pom.xml依赖</strong></p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.redisson<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>redisson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.12.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>Redisson的配置类：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisQueueConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 连接redis的地址</span></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;spring.redis.host&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String host;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//redis的端口号</span></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;spring.redis.port&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String port;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//redis的密码</span></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;spring.redis.password&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RedissonClient <span class="title">redissonClient</span><span class="params">()</span></span>&#123;</span><br><span class="line">       <span class="comment">//此处为单机配置，高可用配置请往下看</span></span><br><span class="line">        Config config = <span class="keyword">new</span> Config();</span><br><span class="line">        <span class="keyword">if</span> (password.equals(<span class="string">&quot;&quot;</span>))&#123;</span><br><span class="line">            config.setCodec(<span class="keyword">new</span> org.redisson.client.codec.StringCodec());</span><br><span class="line">            config.useSingleServer().setAddress(<span class="string">&quot;redis://&quot;</span> + host + <span class="string">&quot;:&quot;</span> + port).setDatabase(<span class="number">2</span>).setTimeout(<span class="number">5000</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            config.useSingleServer().setAddress(<span class="string">&quot;redis://&quot;</span> + host + <span class="string">&quot;:&quot;</span> + port).setPassword(password).setDatabase(<span class="number">2</span>).setTimeout(<span class="number">5000</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Redisson.create(config);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><strong>伪下单代码</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> RedissonClient redissonClient;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TestController</span><span class="params">(RedissonClient redissonClient)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.redissonClient = redissonClient;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/hello&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 目标队列</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        RBlockingQueue&lt;String&gt; blockingRedPacketQueue</span><br><span class="line">                = redissonClient.getBlockingQueue(<span class="string">&quot;userOrderKey&quot;</span>);</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 定时任务将到期的元素转移到目标队列</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        RDelayedQueue&lt;String&gt; delayedRedPacketQueue</span><br><span class="line">                = redissonClient.getDelayedQueue(blockingRedPacketQueue);</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 123456代表订单号，放入队列中</span></span><br><span class="line"><span class="comment">         * 设置10秒后到期</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        delayedRedPacketQueue.offer(<span class="string">&quot;123456&quot;</span>, <span class="number">10</span>, TimeUnit.SECONDS);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;OK&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<p><strong>处理超时订单代码</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AutoStart</span> <span class="keyword">implements</span> <span class="title">CommandLineRunner</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(AutoStart.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RedissonClient redissonClient;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">(String... args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        RBlockingQueue&lt;String&gt; blockingRedPacketQueue</span><br><span class="line">                = redissonClient.getBlockingQueue(<span class="string">&quot;userOrderKey&quot;</span>);</span><br><span class="line"></span><br><span class="line">        RDelayedQueue&lt;String&gt; delayedRedPacketQueue</span><br><span class="line">                = redissonClient.getDelayedQueue(blockingRedPacketQueue);</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">             * 如果当前没有失效的订单，则此循环会暂时阻塞</span></span><br><span class="line"><span class="comment">             * 取出超时订单信息</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            String redPacket = blockingRedPacketQueue.take();</span><br><span class="line">            LOGGER.info(<span class="string">&quot;订单号:&#123;&#125;过期失效&quot;</span>,redPacket);</span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">             * 处理相关业务逻辑</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="高可用配置"><a href="#高可用配置" class="headerlink" title="高可用配置"></a>高可用配置</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 主从部署方式</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Config config = <span class="keyword">new</span> Config();</span><br><span class="line">config.useMasterSlaveServers()</span><br><span class="line">        <span class="comment">//设置redis主节点</span></span><br><span class="line">        .setMasterAddress(<span class="string">&quot;redis://127.0.0.1:6379&quot;</span>)</span><br><span class="line">        <span class="comment">//设置redis从节点</span></span><br><span class="line">        .addSlaveAddress(<span class="string">&quot;redis://127.0.0.2:6379&quot;</span>, <span class="string">&quot;redis://127.0.0.3:6379&quot;</span>);</span><br><span class="line">RedissonClient redisson = Redisson.create(config);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 集群部署方式</span></span><br><span class="line"><span class="comment"> * cluster方式至少6个节点</span></span><br><span class="line"><span class="comment"> * 3主3从，3主做sharding，3从用来保证主宕机后可以高可用</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Config config = <span class="keyword">new</span> Config();</span><br><span class="line">config.useClusterServers()</span><br><span class="line">        .setScanInterval(<span class="number">2000</span>)<span class="comment">//集群状态扫描间隔时间，单位是毫秒</span></span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.1:6379&quot;</span>)</span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.2:6379&quot;</span>)</span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.3:6379&quot;</span>)</span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.4:6379&quot;</span>)</span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.5:6379&quot;</span>)</span><br><span class="line">        .addNodeAddress(<span class="string">&quot;redis://127.0.0.6:6379&quot;</span>);</span><br><span class="line">RedissonClient redissonClient = Redisson.create(config);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 哨兵部署方式</span></span><br><span class="line"><span class="comment"> * sentinel是采用 Paxos拜占庭协议，一般sentinel至少3个节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Config config = <span class="keyword">new</span> Config();</span><br><span class="line">config.useSentinelServers()</span><br><span class="line">        .setMasterName(<span class="string">&quot;my-sentinel-name&quot;</span>)</span><br><span class="line">        .addSentinelAddress(<span class="string">&quot;redis://127.0.0.1:6379&quot;</span>)</span><br><span class="line">        .addSentinelAddress(<span class="string">&quot;redis://127.0.0.2:6379&quot;</span>)</span><br><span class="line">        .addSentinelAddress(<span class="string">&quot;redis://127.0.0.3:6379&quot;</span>);</span><br><span class="line">RedissonClient redisson = Redisson.create(config);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="运行截图"><a href="#运行截图" class="headerlink" title="运行截图"></a>运行截图</h2><p>访问hello接口后，等待10秒，控制台返回如下</p>
-<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/4118908773.png"></p>
-<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>还是那句话，技术类型越来越多，轮子不停造，选对技术合适自己业务的才是最好的，无论是JDK内置的延迟队列还是基于时间轮算法的队列，都无法保证生产系统的高可用性，而Redisson很好的解决了这个问题。</p>
-]]></content>
-      <categories>
-        <category>Redisson</category>
-      </categories>
-      <tags>
-        <tag>SpringBoot</tag>
-        <tag>Redis</tag>
-        <tag>Redisson</tag>
       </tags>
   </entry>
   <entry>
@@ -571,6 +491,86 @@
       <tags>
         <tag>Python</tag>
         <tag>OpenCV</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Mybatis中Mapper传入复杂性参数</title>
+    <url>/archives/39.html</url>
+    <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/3537748652.jpg"></p>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>近期自学了Mybatis框架，学完之后也正在着手写了一个SSM项目，在项目中使用Mybatis持久层框架时，对Mapper.XML传参数时遇到了一些小小的问题，于是在此做个笔记，加深印象。</p>
+<h2 id="Mybatis简介"><a href="#Mybatis简介" class="headerlink" title="Mybatis简介"></a>Mybatis简介</h2><p>持久层框架，是apache下的一个开源项目，使用映射方式，半自动化（需要程序员自己编写Sql语句），相比Hibernate而言学习难度小，上手快。</p>
+<h2 id="Mybatis传参类型"><a href="#Mybatis传参类型" class="headerlink" title="Mybatis传参类型"></a>Mybatis传参类型</h2><ul>
+<li>基本数据类型：int，String，Dete等</li>
+<li>复杂数据类型：Bean实体类，map</li>
+</ul>
+<h2 id="传参属性"><a href="#传参属性" class="headerlink" title="传参属性"></a>传参属性</h2><p>Mybatis中的<strong>parameterType</strong>属性</p>
+<p><em>本文主要记录传入复杂型参数中的Map</em></p>
+<h2 id="传入Map-一"><a href="#传入Map-一" class="headerlink" title="传入Map(一)"></a>传入Map(一)</h2><p><strong>Mapper.XML配置</strong></p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!--parameterType传入的类型为Map，resultType返回为一个实体类--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectUser&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;java.util.Map&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;AdminUser&quot;</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--#&#123;name&#125;花括号中的值为Map集合中的Key--&gt;</span></span><br><span class="line">SELECT  * FROM USER WHERE username = #&#123;name&#125; AND sex =#&#123;sex&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>Mapper接口</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//参数类型为Map，与Mapper.xml中的parameterType参数类型一致</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AdminUser <span class="title">selectUser</span><span class="params">(Map&lt;String, Object&gt; map)</span> <span class="keyword">throws</span> Exception</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>测试类</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//定义Map集合</span></span><br><span class="line">Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</span><br><span class="line">map.put(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;张小明&quot;</span>);</span><br><span class="line">map.put(<span class="string">&quot;sex&quot;</span>, <span class="string">&quot;1&quot;</span>);</span><br><span class="line"><span class="comment">//调用dao接口，并传入Map集合</span></span><br><span class="line">对象.selectUser(map);</span><br></pre></td></tr></table></figure>
+<p><strong>测试结果截图</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/2856416609.png"><br>可见已经查询出了该条数据</p>
+<h2 id="传入Map-二"><a href="#传入Map-二" class="headerlink" title="传入Map(二)"></a>传入Map(二)</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!--parameterType传入的类型为Map，resultType返回为一个实体类--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectUser&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;java.util.Map&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;AdminUser&quot;</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--#&#123;user.username&#125;花括号中的值为User实体类中属性--&gt;</span></span><br><span class="line">SELECT  * FROM USER WHERE username = #&#123;user.username&#125; AND sex =#&#123;user.sex&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>Mapper接口</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//参数类型为User实体类，使用@Param注解的作用是给参数命名</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AdminUser <span class="title">selectUser</span><span class="params">((<span class="meta">@Param(&quot;user&quot;)</span>AdminUser adminUser)</span> <span class="keyword">throws</span> Exception</span>;</span><br></pre></td></tr></table></figure>
+<p><strong>测试类</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//定义实体类对象</span></span><br><span class="line">AdminUser u = <span class="keyword">new</span> AdminUser();</span><br><span class="line">u.setSex(<span class="string">&quot;1&quot;</span>);</span><br><span class="line">u.setUname(<span class="string">&quot;张小明&quot;</span>);</span><br><span class="line"><span class="comment">//调用接口，传入实体类对象</span></span><br><span class="line">对象.selectUser(u);</span><br></pre></td></tr></table></figure>
+<p><strong>测试结果截图</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/2856416609.png"><br>可见已经查询出了该条数据</p>
+<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>总体来说Mybatis的使用还是比较方便的，但需要对Sql语句有一定的掌握，当然也可以使用generator逆向工程生成Mapper，不过生成的代码也需要自己能够理解能够看懂，但在看懂的前提下，还是需要懂得sql语句，万变不离其宗。</p>
+]]></content>
+      <categories>
+        <category>持久层框架</category>
+      </categories>
+      <tags>
+        <tag>Mybatis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Spring+SpringMVC+Mybatis后台管理系统</title>
+    <url>/archives/44.html</url>
+    <content><![CDATA[<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/1239678965.jpg"></p>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>距离上一个发布的SSH项目已经有一段时间了，在完成了上一个SSH项目后，于是乎又开始SSM框架的学习，到今为止SSM框架已基本完成，同时做了一个SSM的后台管理系统，以便巩固更多知识点。</p>
+<hr>
+<h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>项目属于后台管理系统，前端样式风格还是沿用了SSH项目的前端样式（其实是不想再调试前端了，把时间放在了后端），后端使用SSM框架，前后端分离，进行CRUD操作。</p>
+<p><strong>项目模块</strong></p>
+<ul>
+<li>普通人员管理</li>
+<li>后台人员管理</li>
+<li>新闻管理</li>
+<li>资源上传</li>
+<li>资源下载</li>
+<li>类别管理</li>
+<li>部门管理</li>
+</ul>
+<p><strong>架构方式</strong><br>前后端分离，面向接口开发，三层架构，部分链接采用了RESTful风格。</p>
+<p><strong>请求方式</strong><br>Ajax异步向后台发送请求</p>
+<p><strong>数据库</strong><br>mysql关系型数据库</p>
+<p><strong>运行环境</strong><br>tomcat9.x</p>
+<p><strong>开发周期</strong><br>自学 + 做项目= 45天</p>
+<p><strong>项目结构图</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/2737441036.png"></p>
+<p><strong>项目截图</strong></p>
+<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/4235734422.png"></p>
+<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/2378386128.png"></p>
+<p><em>更多截图请点击获取项目</em></p>
+<hr>
+<h2 id="获取项目"><a href="#获取项目" class="headerlink" title="获取项目"></a>获取项目</h2><p><em>更多详情请点击获取项目</em></p>
+<p>项目获取地址：<a href="https://github.com/Snykta/admin_ssm">点击直达</a></p>
+<hr>
+<h2 id="附加"><a href="#附加" class="headerlink" title="附加"></a>附加</h2><p>SSH项目：<a href="https://www.charones.com/archives/13.html">SSH后台管理系统</a></p>
+<hr>
+<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>分享是快乐的，分享是互相进步的，如果项目存在不足缺点，还劳烦请指点迷津，学习我一直在路上，如果是对你的学习路途有了些许帮助，那就还劳烦请动动小手点个Star。</p>
+]]></content>
+      <categories>
+        <category>JavaWeb项目</category>
+      </categories>
+      <tags>
+        <tag>JavaWeb</tag>
       </tags>
   </entry>
 </search>
