@@ -77,19 +77,19 @@
 
 <meta property="og:type" content="article">
 <meta property="og:title" content="记录一次Hibernate一对多插入问题">
-<meta property="og:url" content="https://blog.charones.com/archives/start.html">
+<meta property="og:url" content="https://charones.com/archives/start.html">
 <meta property="og:site_name" content="十七&#39;s Blog">
 <meta property="og:locale">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/1609932867.png">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/3283312814.png">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/3252239438.png">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/348904703.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2019/07/1609932867.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2019/07/3283312814.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2019/07/3252239438.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2019/07/348904703.png">
 <meta property="article:published_time" content="2019-06-12T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-05-17T13:21:04.723Z">
+<meta property="article:modified_time" content="2021-05-20T13:50:49.929Z">
 <meta property="article:author" content="十七">
 <meta property="article:tag" content="Hibernate">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/1609932867.png">
+<meta name="twitter:image" content="https://image.charones.com/usr/uploads/2019/07/1609932867.png">
 
 
 
@@ -119,7 +119,7 @@
 
 
 
-  <link rel="canonical" href="https://blog.charones.com/archives/start.html"/>
+  <link rel="canonical" href="https://charones.com/archives/start.html"/>
 
 
 
@@ -316,7 +316,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.charones.com/archives/start.html">
+    <link itemprop="mainEntityOfPage" href="https://charones.com/archives/start.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="十七">
@@ -413,7 +413,7 @@
       
 
       
-        <p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/1609932867.png"></p>
+        <p><img src="https://image.charones.com/usr/uploads/2019/07/1609932867.png"></p>
 <span id="more"></span>
 
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>   在一次web项目中，其场景为员工与部门的关联关系，在员工表生成一个外键对应其部门表的主键，配置的为一对多关联关系，当插入数据时却出现了员工表外键为null的情况。</p>
@@ -423,15 +423,15 @@
 <h2 id="部门类"><a href="#部门类" class="headerlink" title="部门类"></a>部门类</h2><p>基于hibernate注解配置，getter与setter方法不再列出，只列出了其对应字段</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Table(name=&quot;dept&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dept</span> </span>&#123;</span><br><span class="line"><span class="meta">@Id</span></span><br><span class="line"><span class="meta">@GeneratedValue(generator=&quot;mygener&quot;)</span></span><br><span class="line"><span class="meta">@GenericGenerator(name=&quot;mygener&quot;,strategy=&quot;native&quot;)</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"><span class="meta">@Column(name=&quot;ename&quot;,length=30,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String ename;</span><br><span class="line"><span class="meta">@Column(name=&quot;datas&quot;,length=40,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String datas;</span><br><span class="line"><span class="comment">//注解配置一对多关联关系</span></span><br><span class="line"><span class="meta">@OneToMany(targetEntity=P_user.class,cascade=CascadeType.ALL)</span></span><br><span class="line"><span class="comment">//外键名称</span></span><br><span class="line"><span class="meta">@JoinColumn(name=&quot;dept_id&quot;)</span></span><br><span class="line"><span class="keyword">private</span> Set&lt;P_user&gt; puser = <span class="keyword">new</span> HashSet&lt;P_user&gt;();</span><br></pre></td></tr></table></figure>
 <h2 id="原Test测试类"><a href="#原Test测试类" class="headerlink" title="原Test测试类"></a>原Test测试类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">SessionFactory sessionFactory = SessionFacUtil.getsessionFactory();<span class="comment">//加载配置</span></span><br><span class="line">Session session = sessionFactory.openSession();<span class="comment">//创建session	</span></span><br><span class="line">Transaction tx =  session.beginTransaction();<span class="comment">//开启事务</span></span><br><span class="line">P_user user = <span class="keyword">new</span> P_user ();</span><br><span class="line">user.setNames(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line">Set&lt;P_user&gt; sets = <span class="keyword">new</span> HashSet&lt;P_user&gt;();</span><br><span class="line">sets.add(user);</span><br><span class="line"><span class="comment">//查询已有的部门</span></span><br><span class="line">Dept dept = session.get(Dept.class, <span class="number">12</span>);</span><br><span class="line"><span class="comment">//将该人员类加入到部门的set集合中，并产生外键联系</span></span><br><span class="line">dept.setUsers(sets);</span><br><span class="line">session.save(dept);</span><br><span class="line">tx.commit();</span><br><span class="line">session.close();</span><br><span class="line">sessionFactory.close();</span><br></pre></td></tr></table></figure>
-<p>运行测试无异常，查看数据库也正常插入了数据<br>数据库显示为：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/3283312814.png"></p>
-<p>可见以正常插入，并与产生了外键，可当再次运行测试类，再次插入时出现了问题，新运行的插入的插入成功了，可第一次插入的数据外键却变成了null，也就是说，只能存在这一个外键，不能有两个。<br>如图：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/3252239438.png"></p>
+<p>运行测试无异常，查看数据库也正常插入了数据<br>数据库显示为：<br><img src="https://image.charones.com/usr/uploads/2019/07/3283312814.png"></p>
+<p>可见以正常插入，并与产生了外键，可当再次运行测试类，再次插入时出现了问题，新运行的插入的插入成功了，可第一次插入的数据外键却变成了null，也就是说，只能存在这一个外键，不能有两个。<br>如图：<br><img src="https://image.charones.com/usr/uploads/2019/07/3252239438.png"></p>
 <p>这就让我感到很是疑惑，一对多，由表可知，一个部门下可以有多个部门的，不应该会出现这种null的情况的，一开始以为配置的问题，检查了好多配置地方，也在网上搜寻了一大圈，最后还是无果。</p>
 <p>正当我一筹莫展的时候，突然发现了一句关键的话</p>
 <pre><code>Set&lt;P_user&gt; sets = new HashSet&lt;P_user&gt;();
 </code></pre>
 <p>没错，就是它，我怀疑是不是这个set集合的问题，每次运行new后都产生新的集合，然后再把集合加入dept中，再执行数据插入，会不会是这个的影响，于是改造了以下新的测试类</p>
 <h2 id="新Test测试类"><a href="#新Test测试类" class="headerlink" title="新Test测试类"></a>新Test测试类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">SessionFactory sessionFactory = SessionFacUtil.getsessionFactory();<span class="comment">//加载配置</span></span><br><span class="line">Session session = sessionFactory.openSession();<span class="comment">//创建session	</span></span><br><span class="line">Transaction tx =  session.beginTransaction();<span class="comment">//开启事务</span></span><br><span class="line">P_user user = <span class="keyword">new</span> P_user ();</span><br><span class="line">user.setNames(<span class="string">&quot;张三3&quot;</span>);</span><br><span class="line"><span class="comment">//查询已有的部门</span></span><br><span class="line">Dept dept = session.get(Dept.class, <span class="number">12</span>);</span><br><span class="line"><span class="comment">//将该人员类加入到该查询出来的dept的set集合中</span></span><br><span class="line">dept.getUsers().add(user);</span><br><span class="line">session.save(dept);</span><br><span class="line">tx.commit();</span><br><span class="line">session.close();</span><br><span class="line">sessionFactory.close();</span><br></pre></td></tr></table></figure>
-<p>测试结果完美通过<br>数据库截图：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/07/348904703.png"></p>
+<p>测试结果完美通过<br>数据库截图：<br><img src="https://image.charones.com/usr/uploads/2019/07/348904703.png"></p>
 <h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>就是这个每次new的set集合问题，结果执行时有让数据库update的了以下，把第一次插入的数据变为了null。</p>
 <p>一次小小的细节问题，也体现出看来我对hibernate了解学习的还不够透彻，还需努力专研。</p>
 

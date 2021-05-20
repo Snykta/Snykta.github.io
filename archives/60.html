@@ -77,18 +77,18 @@
 
 <meta property="og:type" content="article">
 <meta property="og:title" content="IDEA中maven构建的SSM项目mapper绑定失败">
-<meta property="og:url" content="https://blog.charones.com/archives/60.html">
+<meta property="og:url" content="https://charones.com/archives/60.html">
 <meta property="og:site_name" content="十七&#39;s Blog">
 <meta property="og:locale">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/2483435586.jpg">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/2979408028.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2019/09/2483435586.jpg">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2019/09/2979408028.png">
 <meta property="article:published_time" content="2019-09-16T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-05-17T13:33:08.859Z">
+<meta property="article:modified_time" content="2021-05-20T13:50:49.922Z">
 <meta property="article:author" content="十七">
 <meta property="article:tag" content="maven">
 <meta property="article:tag" content="IDEA">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/2483435586.jpg">
+<meta name="twitter:image" content="https://image.charones.com/usr/uploads/2019/09/2483435586.jpg">
 
 
 
@@ -118,7 +118,7 @@
 
 
 
-  <link rel="canonical" href="https://blog.charones.com/archives/60.html"/>
+  <link rel="canonical" href="https://charones.com/archives/60.html"/>
 
 
 
@@ -315,7 +315,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.charones.com/archives/60.html">
+    <link itemprop="mainEntityOfPage" href="https://charones.com/archives/60.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="十七">
@@ -412,12 +412,12 @@
       
 
       
-        <p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/2483435586.jpg"></p>
+        <p><img src="https://image.charones.com/usr/uploads/2019/09/2483435586.jpg"></p>
 <span id="more"></span>
 
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前开发Web项目一直是用eclipse来开发，IDEA也用过，但一直用它来写一些小项目(非web项目)，今天突然想用IDEA来开发web项目，于是说干就干，场景：利用maven构建一个SSM项目。一顿配置操作后把项目构建成了，可当测试时却出现了问题，Mybatis的Mapper一直绑定不上，一直报错。</p>
 <hr>
-<h2 id="Bug"><a href="#Bug" class="headerlink" title="Bug"></a>Bug</h2><p>如图所示：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/09/2979408028.png"></p>
+<h2 id="Bug"><a href="#Bug" class="headerlink" title="Bug"></a>Bug</h2><p>如图所示：<br><img src="https://image.charones.com/usr/uploads/2019/09/2979408028.png"></p>
 <p>一直提示提示：Invalid bound statement (not found)，意思为绑定语句错误，找不到该方法。</p>
 <h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>因为之前一直用eclipse来开发，这个问题还是第一次遇到，首先我先想到是不是配置文件错误，于是把配置文件逐个排查，经过一系列测试排查，发现配置文件并没有错误。没问题后又对代码经过一系列的检查，可也还是没有发现问题。<br><strong>猜想</strong><br>正当我一筹莫展时，突然想到是不是IDEA把项目编译后那些xml配置文件存放的路径的问题，因为IDEA明确了源码和资源文件的放置位置（maven项目），也就是说源码就要会被编译，但当我把xml文件放在java目录下的mian目录中我猜想是不是没被编译到classes中，才导致找不到方法。</p>
 <h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>在pom.xml的<build>标签下中加入如下配置</p>

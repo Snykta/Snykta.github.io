@@ -77,20 +77,20 @@
 
 <meta property="og:type" content="article">
 <meta property="og:title" content="Docker安装Mysql并挂载目录后运行">
-<meta property="og:url" content="https://blog.charones.com/archives/104.html">
+<meta property="og:url" content="https://charones.com/archives/104.html">
 <meta property="og:site_name" content="十七&#39;s Blog">
 <meta property="og:locale">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/3405473456.png">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/2194755708.png">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/1746848017.png">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/3462937496.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2020/10/3405473456.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2020/10/2194755708.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2020/10/1746848017.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2020/10/3462937496.png">
 <meta property="article:published_time" content="2020-08-09T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-05-17T13:42:42.562Z">
+<meta property="article:modified_time" content="2021-05-20T13:50:49.915Z">
 <meta property="article:author" content="十七">
 <meta property="article:tag" content="Docker">
 <meta property="article:tag" content="MySql">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/3405473456.png">
+<meta name="twitter:image" content="https://image.charones.com/usr/uploads/2020/10/3405473456.png">
 
 
 
@@ -120,7 +120,7 @@
 
 
 
-  <link rel="canonical" href="https://blog.charones.com/archives/104.html"/>
+  <link rel="canonical" href="https://charones.com/archives/104.html"/>
 
 
 
@@ -317,7 +317,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.charones.com/archives/104.html">
+    <link itemprop="mainEntityOfPage" href="https://charones.com/archives/104.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="十七">
@@ -425,7 +425,7 @@
       
 
       
-        <p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/3405473456.png"></p>
+        <p><img src="https://image.charones.com/usr/uploads/2020/10/3405473456.png"></p>
 <span id="more"></span>
 
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>记一次MySql数据库读写分离的的功能，其中里面涉及到了数据库的主从复制，并且是在Docker中的运行的MySql实例，于是乎就写下这篇文章，记录在Docker中安装MySql的步骤。</p>
@@ -439,13 +439,13 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 3308:3306 --name mysql-server-01 -e MYSQL_ROOT_PASSWORD=&quot;123456&quot; mysql:8.0.18</span><br></pre></td></tr></table></figure>
 <p>2、查看是否运行成功</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
-<p>如图所示则成功：<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/2194755708.png"></p>
+<p>如图所示则成功：<br><img src="https://image.charones.com/usr/uploads/2020/10/2194755708.png"></p>
 <p>3、进入容器：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it mysql-server-01 bash</span><br></pre></td></tr></table></figure>
 <p><strong>提示：</strong>mysql-server-01就是运行时设置的容器名称</p>
 <p>4、查看容器内mysql配置文件路径</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql --help | grep my.cnf</span><br></pre></td></tr></table></figure>
-<p>如图：<img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/1746848017.png"></p>
+<p>如图：<img src="https://image.charones.com/usr/uploads/2020/10/1746848017.png"></p>
 <p>5、复制配置文件到宿主机目录<br>找到容器路径后，退出容器(ctrl+d)，在<strong>宿主机</strong>下执行如下命令</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker cp mysql-server-01:/etc/mysql/my.cnf /mydocker/mysql-server-docker/mysql-01/conf</span><br></pre></td></tr></table></figure>
 <p><strong>提示：</strong>宿主机路径位置一定要创建好</p>
@@ -461,7 +461,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UPDATE user SET `Host` = &#x27;%&#x27; WHERE `User` = &#x27;root&#x27; LIMIT 1;</span><br></pre></td></tr></table></figure>
 <p>4、刷新生效</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
-<p>5、连接成功<br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/3462937496.png"></p>
+<p>5、连接成功<br><img src="https://image.charones.com/usr/uploads/2020/10/3462937496.png"></p>
 <h2 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h2><p>以上就是在Docker中安装MySql的步骤，可以配置集群，主从复制等，如果测试连接不上，可以检查以下：端口是否开放，端口是否被占用，映射是否成功，容器是否运行，安全组或者防火墙是否打开等这几处来检测。</p>
 
       

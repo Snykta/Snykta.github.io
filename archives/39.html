@@ -77,18 +77,18 @@
 
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mybatis中Mapper传入复杂性参数">
-<meta property="og:url" content="https://blog.charones.com/archives/39.html">
+<meta property="og:url" content="https://charones.com/archives/39.html">
 <meta property="og:site_name" content="十七&#39;s Blog">
 <meta property="og:locale">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/3537748652.jpg">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/2856416609.png">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/2856416609.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2019/08/3537748652.jpg">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2019/08/2856416609.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2019/08/2856416609.png">
 <meta property="article:published_time" content="2019-08-01T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-05-17T13:28:48.006Z">
+<meta property="article:modified_time" content="2021-05-20T13:50:49.903Z">
 <meta property="article:author" content="十七">
 <meta property="article:tag" content="Mybatis">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/3537748652.jpg">
+<meta name="twitter:image" content="https://image.charones.com/usr/uploads/2019/08/3537748652.jpg">
 
 
 
@@ -118,7 +118,7 @@
 
 
 
-  <link rel="canonical" href="https://blog.charones.com/archives/39.html"/>
+  <link rel="canonical" href="https://charones.com/archives/39.html"/>
 
 
 
@@ -315,7 +315,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.charones.com/archives/39.html">
+    <link itemprop="mainEntityOfPage" href="https://charones.com/archives/39.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="十七">
@@ -412,7 +412,7 @@
       
 
       
-        <p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/3537748652.jpg"></p>
+        <p><img src="https://image.charones.com/usr/uploads/2019/08/3537748652.jpg"></p>
 <span id="more"></span>
 
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>近期自学了Mybatis框架，学完之后也正在着手写了一个SSM项目，在项目中使用Mybatis持久层框架时，对Mapper.XML传参数时遇到了一些小小的问题，于是在此做个笔记，加深印象。</p>
@@ -429,13 +429,13 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//参数类型为Map，与Mapper.xml中的parameterType参数类型一致</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AdminUser <span class="title">selectUser</span><span class="params">(Map&lt;String, Object&gt; map)</span> <span class="keyword">throws</span> Exception</span>;</span><br></pre></td></tr></table></figure>
 <p><strong>测试类</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义Map集合</span></span><br><span class="line">Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</span><br><span class="line">map.put(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;张小明&quot;</span>);</span><br><span class="line">map.put(<span class="string">&quot;sex&quot;</span>, <span class="string">&quot;1&quot;</span>);</span><br><span class="line"><span class="comment">//调用dao接口，并传入Map集合</span></span><br><span class="line">对象.selectUser(map);</span><br></pre></td></tr></table></figure>
-<p><strong>测试结果截图</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/2856416609.png"><br>可见已经查询出了该条数据</p>
+<p><strong>测试结果截图</strong><br><img src="https://image.charones.com/usr/uploads/2019/08/2856416609.png"><br>可见已经查询出了该条数据</p>
 <h2 id="传入Map-二"><a href="#传入Map-二" class="headerlink" title="传入Map(二)"></a>传入Map(二)</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--parameterType传入的类型为Map，resultType返回为一个实体类--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectUser&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;java.util.Map&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;AdminUser&quot;</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--#&#123;user.username&#125;花括号中的值为User实体类中属性--&gt;</span></span><br><span class="line">SELECT  * FROM USER WHERE username = #&#123;user.username&#125; AND sex =#&#123;user.sex&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p><strong>Mapper接口</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//参数类型为User实体类，使用@Param注解的作用是给参数命名</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> AdminUser <span class="title">selectUser</span><span class="params">((<span class="meta">@Param(&quot;user&quot;)</span>AdminUser adminUser)</span> <span class="keyword">throws</span> Exception</span>;</span><br></pre></td></tr></table></figure>
 <p><strong>测试类</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义实体类对象</span></span><br><span class="line">AdminUser u = <span class="keyword">new</span> AdminUser();</span><br><span class="line">u.setSex(<span class="string">&quot;1&quot;</span>);</span><br><span class="line">u.setUname(<span class="string">&quot;张小明&quot;</span>);</span><br><span class="line"><span class="comment">//调用接口，传入实体类对象</span></span><br><span class="line">对象.selectUser(u);</span><br></pre></td></tr></table></figure>
-<p><strong>测试结果截图</strong><br><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2019/08/2856416609.png"><br>可见已经查询出了该条数据</p>
+<p><strong>测试结果截图</strong><br><img src="https://image.charones.com/usr/uploads/2019/08/2856416609.png"><br>可见已经查询出了该条数据</p>
 <h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>总体来说Mybatis的使用还是比较方便的，但需要对Sql语句有一定的掌握，当然也可以使用generator逆向工程生成Mapper，不过生成的代码也需要自己能够理解能够看懂，但在看懂的前提下，还是需要懂得sql语句，万变不离其宗。</p>
 
       

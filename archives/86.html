@@ -77,19 +77,19 @@
 
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redisson实现订单超时自动关闭(高可用)">
-<meta property="og:url" content="https://blog.charones.com/archives/86.html">
+<meta property="og:url" content="https://charones.com/archives/86.html">
 <meta property="og:site_name" content="十七&#39;s Blog">
 <meta property="og:locale">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/04/545024470.jpg">
-<meta property="og:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/4118908773.png">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2020/04/545024470.jpg">
+<meta property="og:image" content="https://image.charones.com/usr/uploads/2020/10/4118908773.png">
 <meta property="article:published_time" content="2020-01-13T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-05-17T14:19:18.372Z">
+<meta property="article:modified_time" content="2021-05-20T13:50:49.899Z">
 <meta property="article:author" content="十七">
 <meta property="article:tag" content="SpringBoot">
 <meta property="article:tag" content="Redis">
 <meta property="article:tag" content="Redisson">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/04/545024470.jpg">
+<meta name="twitter:image" content="https://image.charones.com/usr/uploads/2020/04/545024470.jpg">
 
 
 
@@ -119,7 +119,7 @@
 
 
 
-  <link rel="canonical" href="https://blog.charones.com/archives/86.html"/>
+  <link rel="canonical" href="https://charones.com/archives/86.html"/>
 
 
 
@@ -316,7 +316,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.charones.com/archives/86.html">
+    <link itemprop="mainEntityOfPage" href="https://charones.com/archives/86.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="十七">
@@ -413,7 +413,7 @@
       
 
       
-        <p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/04/545024470.jpg"></p>
+        <p><img src="https://image.charones.com/usr/uploads/2020/04/545024470.jpg"></p>
 <span id="more"></span>
 
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>艺术来源于生活，技术来源于业务，由于原业务上的需求，需要做一个用户下单后超过一定时间内没有支付自动取消订单，说白了就是一个超时自动取消的功能，这种场景恐怕是非常非常常见的一个业务需求了，在此记录下使用redis来实现此功能。</p>
@@ -445,7 +445,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 哨兵部署方式</span></span><br><span class="line"><span class="comment"> * sentinel是采用 Paxos拜占庭协议，一般sentinel至少3个节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Config config = <span class="keyword">new</span> Config();</span><br><span class="line">config.useSentinelServers()</span><br><span class="line">        .setMasterName(<span class="string">&quot;my-sentinel-name&quot;</span>)</span><br><span class="line">        .addSentinelAddress(<span class="string">&quot;redis://127.0.0.1:6379&quot;</span>)</span><br><span class="line">        .addSentinelAddress(<span class="string">&quot;redis://127.0.0.2:6379&quot;</span>)</span><br><span class="line">        .addSentinelAddress(<span class="string">&quot;redis://127.0.0.3:6379&quot;</span>);</span><br><span class="line">RedissonClient redisson = Redisson.create(config);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h2 id="运行截图"><a href="#运行截图" class="headerlink" title="运行截图"></a>运行截图</h2><p>访问hello接口后，等待10秒，控制台返回如下</p>
-<p><img src="https://vansa-1252347251.cos.ap-guangzhou.myqcloud.com/usr/uploads/2020/10/4118908773.png"></p>
+<p><img src="https://image.charones.com/usr/uploads/2020/10/4118908773.png"></p>
 <h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>还是那句话，技术类型越来越多，轮子不停造，选对技术合适自己业务的才是最好的，无论是JDK内置的延迟队列还是基于时间轮算法的队列，都无法保证生产系统的高可用性，而Redisson很好的解决了这个问题。</p>
 
       
