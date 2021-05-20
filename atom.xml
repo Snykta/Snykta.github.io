@@ -102,9 +102,9 @@
         <category term="MybatisPlus" scheme="https://charones.com/categories/MybatisPlus/"/>
         
         
-        <category term="MybatisPlus" scheme="https://charones.com/tags/MybatisPlus/"/>
-        
         <category term="SpringBoot" scheme="https://charones.com/tags/SpringBoot/"/>
+        
+        <category term="MybatisPlus" scheme="https://charones.com/tags/MybatisPlus/"/>
         
     </entry>
     
