@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>记录一次Hibernate一对多插入问题</title>
+    <url>/archives/start.html</url>
+    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/07/1609932867.png"></p>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>   在一次web项目中，其场景为员工与部门的关联关系，在员工表生成一个外键对应其部门表的主键，配置的为一对多关联关系，当插入数据时却出现了员工表外键为null的情况。</p>
+<hr>
+<h2 id="员工类"><a href="#员工类" class="headerlink" title="员工类"></a>员工类</h2><p>基于hibernate注解配置，getter与setter方法不再列出，只列出了其对应字段。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Table(name=&quot;p_users&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">P_user</span> </span>&#123;</span><br><span class="line"><span class="meta">@Id</span></span><br><span class="line"><span class="meta">@GeneratedValue(generator=&quot;mygener&quot;)</span></span><br><span class="line"><span class="comment">//整长策略</span></span><br><span class="line"><span class="meta">@GenericGenerator(name=&quot;mygener&quot;,strategy=&quot;native&quot;)</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"><span class="meta">@Column(name=&quot;names&quot;,length=20,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String names;</span><br><span class="line"><span class="meta">@Column(name=&quot;sex&quot;,length=10,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String sex;</span><br><span class="line"><span class="meta">@Column(name=&quot;iphone&quot;,length=40,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String iphone;</span><br><span class="line"><span class="meta">@Column(name=&quot;email&quot;,length=45,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String email;</span><br><span class="line"><span class="meta">@Column(name=&quot;states&quot;,length=10,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String states;</span><br></pre></td></tr></table></figure>
+<h2 id="部门类"><a href="#部门类" class="headerlink" title="部门类"></a>部门类</h2><p>基于hibernate注解配置，getter与setter方法不再列出，只列出了其对应字段</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Table(name=&quot;dept&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dept</span> </span>&#123;</span><br><span class="line"><span class="meta">@Id</span></span><br><span class="line"><span class="meta">@GeneratedValue(generator=&quot;mygener&quot;)</span></span><br><span class="line"><span class="meta">@GenericGenerator(name=&quot;mygener&quot;,strategy=&quot;native&quot;)</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"><span class="meta">@Column(name=&quot;ename&quot;,length=30,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String ename;</span><br><span class="line"><span class="meta">@Column(name=&quot;datas&quot;,length=40,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String datas;</span><br><span class="line"><span class="comment">//注解配置一对多关联关系</span></span><br><span class="line"><span class="meta">@OneToMany(targetEntity=P_user.class,cascade=CascadeType.ALL)</span></span><br><span class="line"><span class="comment">//外键名称</span></span><br><span class="line"><span class="meta">@JoinColumn(name=&quot;dept_id&quot;)</span></span><br><span class="line"><span class="keyword">private</span> Set&lt;P_user&gt; puser = <span class="keyword">new</span> HashSet&lt;P_user&gt;();</span><br></pre></td></tr></table></figure>
+<h2 id="原Test测试类"><a href="#原Test测试类" class="headerlink" title="原Test测试类"></a>原Test测试类</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SessionFactory sessionFactory = SessionFacUtil.getsessionFactory();<span class="comment">//加载配置</span></span><br><span class="line">Session session = sessionFactory.openSession();<span class="comment">//创建session	</span></span><br><span class="line">Transaction tx =  session.beginTransaction();<span class="comment">//开启事务</span></span><br><span class="line">P_user user = <span class="keyword">new</span> P_user ();</span><br><span class="line">user.setNames(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line">Set&lt;P_user&gt; sets = <span class="keyword">new</span> HashSet&lt;P_user&gt;();</span><br><span class="line">sets.add(user);</span><br><span class="line"><span class="comment">//查询已有的部门</span></span><br><span class="line">Dept dept = session.get(Dept.class, <span class="number">12</span>);</span><br><span class="line"><span class="comment">//将该人员类加入到部门的set集合中，并产生外键联系</span></span><br><span class="line">dept.setUsers(sets);</span><br><span class="line">session.save(dept);</span><br><span class="line">tx.commit();</span><br><span class="line">session.close();</span><br><span class="line">sessionFactory.close();</span><br></pre></td></tr></table></figure>
+<p>运行测试无异常，查看数据库也正常插入了数据<br>数据库显示为：<br><img src="https://image.charones.com/usr/uploads/2019/07/3283312814.png"></p>
+<p>可见以正常插入，并与产生了外键，可当再次运行测试类，再次插入时出现了问题，新运行的插入的插入成功了，可第一次插入的数据外键却变成了null，也就是说，只能存在这一个外键，不能有两个。<br>如图：<br><img src="https://image.charones.com/usr/uploads/2019/07/3252239438.png"></p>
+<p>这就让我感到很是疑惑，一对多，由表可知，一个部门下可以有多个部门的，不应该会出现这种null的情况的，一开始以为配置的问题，检查了好多配置地方，也在网上搜寻了一大圈，最后还是无果。</p>
+<p>正当我一筹莫展的时候，突然发现了一句关键的话</p>
+<pre><code>Set&lt;P_user&gt; sets = new HashSet&lt;P_user&gt;();
+</code></pre>
+<p>没错，就是它，我怀疑是不是这个set集合的问题，每次运行new后都产生新的集合，然后再把集合加入dept中，再执行数据插入，会不会是这个的影响，于是改造了以下新的测试类</p>
+<h2 id="新Test测试类"><a href="#新Test测试类" class="headerlink" title="新Test测试类"></a>新Test测试类</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SessionFactory sessionFactory = SessionFacUtil.getsessionFactory();<span class="comment">//加载配置</span></span><br><span class="line">Session session = sessionFactory.openSession();<span class="comment">//创建session	</span></span><br><span class="line">Transaction tx =  session.beginTransaction();<span class="comment">//开启事务</span></span><br><span class="line">P_user user = <span class="keyword">new</span> P_user ();</span><br><span class="line">user.setNames(<span class="string">&quot;张三3&quot;</span>);</span><br><span class="line"><span class="comment">//查询已有的部门</span></span><br><span class="line">Dept dept = session.get(Dept.class, <span class="number">12</span>);</span><br><span class="line"><span class="comment">//将该人员类加入到该查询出来的dept的set集合中</span></span><br><span class="line">dept.getUsers().add(user);</span><br><span class="line">session.save(dept);</span><br><span class="line">tx.commit();</span><br><span class="line">session.close();</span><br><span class="line">sessionFactory.close();</span><br></pre></td></tr></table></figure>
+<p>测试结果完美通过<br>数据库截图：<br><img src="https://image.charones.com/usr/uploads/2019/07/348904703.png"></p>
+<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>就是这个每次new的set集合问题，结果执行时有让数据库update的了以下，把第一次插入的数据变为了null。</p>
+<p>一次小小的细节问题，也体现出看来我对hibernate了解学习的还不够透彻，还需努力专研。</p>
+]]></content>
+      <categories>
+        <category>持久层框架</category>
+      </categories>
+      <tags>
+        <tag>Hibernate</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Spring+Struts2+Hibernate后台管理系统</title>
     <url>/archives/13.html</url>
     <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/07/3323727449.png"></p>
@@ -77,32 +109,6 @@
       </tags>
   </entry>
   <entry>
-    <title>SpringMVC在非Contoller层获取request和response对象</title>
-    <url>/archives/36.html</url>
-    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/07/1458723386.jpg"></p>
-<span id="more"></span>
-
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在SpringMVC中，如果在contoller层获取request和response对象是很好获取的，直接在handler方法参数中可以直接拿到request和response对象，而在非contoller层该如何获取呢？</p>
-<p>答：通过springMVC提供的RequestContextHolder来获取</p>
-<hr>
-<h2 id="获取方法"><a href="#获取方法" class="headerlink" title="获取方法"></a>获取方法</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">HttpServletResponse response =((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();</span><br><span class="line"></span><br><span class="line">HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>需要导入的包</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.springframework.web.context.request.RequestContextHolder;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.context.request.ServletRequestAttributes;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>以上就是在非contoller层获取request和response对象的方法，也算是做一个笔记，防止日后有遗忘。</p>
-]]></content>
-      <categories>
-        <category>SpringMVC</category>
-      </categories>
-      <tags>
-        <tag>SpringMVC</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Spring+SpringMVC+Mybatis后台管理系统</title>
     <url>/archives/44.html</url>
     <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/08/1239678965.jpg"></p>
@@ -147,154 +153,29 @@
       </tags>
   </entry>
   <entry>
-    <title>记录一次Hibernate一对多插入问题</title>
-    <url>/archives/start.html</url>
-    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/07/1609932867.png"></p>
+    <title>SpringMVC在非Contoller层获取request和response对象</title>
+    <url>/archives/36.html</url>
+    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/07/1458723386.jpg"></p>
 <span id="more"></span>
 
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>   在一次web项目中，其场景为员工与部门的关联关系，在员工表生成一个外键对应其部门表的主键，配置的为一对多关联关系，当插入数据时却出现了员工表外键为null的情况。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在SpringMVC中，如果在contoller层获取request和response对象是很好获取的，直接在handler方法参数中可以直接拿到request和response对象，而在非contoller层该如何获取呢？</p>
+<p>答：通过springMVC提供的RequestContextHolder来获取</p>
 <hr>
-<h2 id="员工类"><a href="#员工类" class="headerlink" title="员工类"></a>员工类</h2><p>基于hibernate注解配置，getter与setter方法不再列出，只列出了其对应字段。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Table(name=&quot;p_users&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">P_user</span> </span>&#123;</span><br><span class="line"><span class="meta">@Id</span></span><br><span class="line"><span class="meta">@GeneratedValue(generator=&quot;mygener&quot;)</span></span><br><span class="line"><span class="comment">//整长策略</span></span><br><span class="line"><span class="meta">@GenericGenerator(name=&quot;mygener&quot;,strategy=&quot;native&quot;)</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"><span class="meta">@Column(name=&quot;names&quot;,length=20,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String names;</span><br><span class="line"><span class="meta">@Column(name=&quot;sex&quot;,length=10,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String sex;</span><br><span class="line"><span class="meta">@Column(name=&quot;iphone&quot;,length=40,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String iphone;</span><br><span class="line"><span class="meta">@Column(name=&quot;email&quot;,length=45,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String email;</span><br><span class="line"><span class="meta">@Column(name=&quot;states&quot;,length=10,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String states;</span><br></pre></td></tr></table></figure>
-<h2 id="部门类"><a href="#部门类" class="headerlink" title="部门类"></a>部门类</h2><p>基于hibernate注解配置，getter与setter方法不再列出，只列出了其对应字段</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="meta">@Table(name=&quot;dept&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dept</span> </span>&#123;</span><br><span class="line"><span class="meta">@Id</span></span><br><span class="line"><span class="meta">@GeneratedValue(generator=&quot;mygener&quot;)</span></span><br><span class="line"><span class="meta">@GenericGenerator(name=&quot;mygener&quot;,strategy=&quot;native&quot;)</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"><span class="meta">@Column(name=&quot;ename&quot;,length=30,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String ename;</span><br><span class="line"><span class="meta">@Column(name=&quot;datas&quot;,length=40,nullable=true,unique=false)</span></span><br><span class="line"><span class="keyword">private</span> String datas;</span><br><span class="line"><span class="comment">//注解配置一对多关联关系</span></span><br><span class="line"><span class="meta">@OneToMany(targetEntity=P_user.class,cascade=CascadeType.ALL)</span></span><br><span class="line"><span class="comment">//外键名称</span></span><br><span class="line"><span class="meta">@JoinColumn(name=&quot;dept_id&quot;)</span></span><br><span class="line"><span class="keyword">private</span> Set&lt;P_user&gt; puser = <span class="keyword">new</span> HashSet&lt;P_user&gt;();</span><br></pre></td></tr></table></figure>
-<h2 id="原Test测试类"><a href="#原Test测试类" class="headerlink" title="原Test测试类"></a>原Test测试类</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SessionFactory sessionFactory = SessionFacUtil.getsessionFactory();<span class="comment">//加载配置</span></span><br><span class="line">Session session = sessionFactory.openSession();<span class="comment">//创建session	</span></span><br><span class="line">Transaction tx =  session.beginTransaction();<span class="comment">//开启事务</span></span><br><span class="line">P_user user = <span class="keyword">new</span> P_user ();</span><br><span class="line">user.setNames(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line">Set&lt;P_user&gt; sets = <span class="keyword">new</span> HashSet&lt;P_user&gt;();</span><br><span class="line">sets.add(user);</span><br><span class="line"><span class="comment">//查询已有的部门</span></span><br><span class="line">Dept dept = session.get(Dept.class, <span class="number">12</span>);</span><br><span class="line"><span class="comment">//将该人员类加入到部门的set集合中，并产生外键联系</span></span><br><span class="line">dept.setUsers(sets);</span><br><span class="line">session.save(dept);</span><br><span class="line">tx.commit();</span><br><span class="line">session.close();</span><br><span class="line">sessionFactory.close();</span><br></pre></td></tr></table></figure>
-<p>运行测试无异常，查看数据库也正常插入了数据<br>数据库显示为：<br><img src="https://image.charones.com/usr/uploads/2019/07/3283312814.png"></p>
-<p>可见以正常插入，并与产生了外键，可当再次运行测试类，再次插入时出现了问题，新运行的插入的插入成功了，可第一次插入的数据外键却变成了null，也就是说，只能存在这一个外键，不能有两个。<br>如图：<br><img src="https://image.charones.com/usr/uploads/2019/07/3252239438.png"></p>
-<p>这就让我感到很是疑惑，一对多，由表可知，一个部门下可以有多个部门的，不应该会出现这种null的情况的，一开始以为配置的问题，检查了好多配置地方，也在网上搜寻了一大圈，最后还是无果。</p>
-<p>正当我一筹莫展的时候，突然发现了一句关键的话</p>
-<pre><code>Set&lt;P_user&gt; sets = new HashSet&lt;P_user&gt;();
-</code></pre>
-<p>没错，就是它，我怀疑是不是这个set集合的问题，每次运行new后都产生新的集合，然后再把集合加入dept中，再执行数据插入，会不会是这个的影响，于是改造了以下新的测试类</p>
-<h2 id="新Test测试类"><a href="#新Test测试类" class="headerlink" title="新Test测试类"></a>新Test测试类</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SessionFactory sessionFactory = SessionFacUtil.getsessionFactory();<span class="comment">//加载配置</span></span><br><span class="line">Session session = sessionFactory.openSession();<span class="comment">//创建session	</span></span><br><span class="line">Transaction tx =  session.beginTransaction();<span class="comment">//开启事务</span></span><br><span class="line">P_user user = <span class="keyword">new</span> P_user ();</span><br><span class="line">user.setNames(<span class="string">&quot;张三3&quot;</span>);</span><br><span class="line"><span class="comment">//查询已有的部门</span></span><br><span class="line">Dept dept = session.get(Dept.class, <span class="number">12</span>);</span><br><span class="line"><span class="comment">//将该人员类加入到该查询出来的dept的set集合中</span></span><br><span class="line">dept.getUsers().add(user);</span><br><span class="line">session.save(dept);</span><br><span class="line">tx.commit();</span><br><span class="line">session.close();</span><br><span class="line">sessionFactory.close();</span><br></pre></td></tr></table></figure>
-<p>测试结果完美通过<br>数据库截图：<br><img src="https://image.charones.com/usr/uploads/2019/07/348904703.png"></p>
-<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>就是这个每次new的set集合问题，结果执行时有让数据库update的了以下，把第一次插入的数据变为了null。</p>
-<p>一次小小的细节问题，也体现出看来我对hibernate了解学习的还不够透彻，还需努力专研。</p>
-]]></content>
-      <categories>
-        <category>持久层框架</category>
-      </categories>
-      <tags>
-        <tag>Hibernate</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>使用git将本地源码上传到github</title>
-    <url>/archives/51.html</url>
-    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/09/3269077972.jpg"></p>
-<span id="more"></span>
+<h2 id="获取方法"><a href="#获取方法" class="headerlink" title="获取方法"></a>获取方法</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">HttpServletResponse response =((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();</span><br><span class="line"></span><br><span class="line">HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();</span><br></pre></td></tr></table></figure>
 
 
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>大大小小的项目也做了很多项目，但一直都是在电脑本地存储，而今突然想把这些项目托管到github上，于是就整理了这篇文章，利用git将本地项目上传到GitHub仓库中。</p>
+
+<p><strong>需要导入的包</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.springframework.web.context.request.RequestContextHolder;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.context.request.ServletRequestAttributes;</span><br></pre></td></tr></table></figure>
+
 <hr>
-<h2 id="Git简介"><a href="#Git简介" class="headerlink" title="Git简介"></a>Git简介</h2><p>Git是一个<strong>分布式</strong>版本控制系统，用于对项目的版本控制，当然也有<strong>集中式</strong>版本控制系统，比如：SVN。最初 Git 的开发是为了辅助 Linux 内核开发的过程，后来慢慢的在很多其他自由软件项目中也使用了 Git。</p>
-<h2 id="何为GitHub"><a href="#何为GitHub" class="headerlink" title="何为GitHub"></a>何为GitHub</h2><p>gitHub是国外的一个面向开源及私有软件项目的托管平台，因为只支持git 作为唯一的版本库格式进行托管，故名gitHub。国内的也有托管平台，比如：码云（Gitee）。</p>
-<h2 id="Github操作"><a href="#Github操作" class="headerlink" title="Github操作"></a><strong>Github操作</strong></h2><p>先在GitHub上创建一个项目，目的是用于把本地的项目上传到该远程仓库中，在此引用网上的一张图（看后一目了然）如下图：<br><img src="https://img-blog.csdn.net/20180704092925840?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L20wXzM3NzI1MDAz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
-<h2 id="Git操作"><a href="#Git操作" class="headerlink" title="Git操作"></a><strong>Git操作</strong></h2><p><strong>第一步</strong><br>打开Git Bash，在命令行中cd进入项目目录中<br><img src="https://image.charones.com/usr/uploads/2019/09/562919979.png"><br>进入后输入命令：</p>
-<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">init</span></span><br></pre></td></tr></table></figure>
-<p>作用：在当前项目的目录中生成本地的git管理（会在当前目录下多了一个.git文件夹）</p>
-<p><strong>第二步</strong><br>输入命令：</p>
-<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">git <span class="builtin-name">add</span> .</span><br></pre></td></tr></table></figure>
-<p><img src="https://image.charones.com/usr/uploads/2019/09/181607367.png"><br>作用：将项目上所有的文件添加到仓库中的意思，如果想添加某个特定的文件，只需把.换成这个特定的文件名即可</p>
-<p><strong>第三步</strong><br>输入命令：</p>
-<figure class="highlight nginx"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git</span> commit -m <span class="string">&quot;提交更新&quot;</span></span><br></pre></td></tr></table></figure>
-<p><img src="https://image.charones.com/usr/uploads/2019/09/830437848.png"><br>作用：表示你对这次提交的注释，双引号里面的内容可以根据个人的需要<br>改。</p>
-<p><em><strong>输入完后会出现输入自己的账号或者姓名的提示，如图：</strong></em></p>
-<p><img src="https://image.charones.com/usr/uploads/2019/09/3339086964.png"><br>这时用上面提示的代码输入自己的邮箱或名字。<br>如命令：</p>
-<figure class="highlight mipsasm"><table><tr><td class="code"><pre><span class="line">git remote <span class="keyword">add </span><span class="keyword">origin </span>&lt;远程github地址&gt;</span><br></pre></td></tr></table></figure>
-<p>&lt;&gt;中为远程地址，实际输入命令没有&lt;&gt;符号，后面直接跟地址</p>
-<p>输入后再输入git commit -m “提交更新”命令时就会成功。</p>
-<p><strong>第四步</strong><br>输入命令：</p>
-<figure class="highlight maxima"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">push</span> -u <span class="built_in">origin</span> master</span><br></pre></td></tr></table></figure>
-<p><img src="https://image.charones.com/usr/uploads/2019/09/252055681.png"><br>作用：将本地项目上传到远程GitHub仓库中<br>这是如果在远程项目中有存在的文件，则需要先将远程仓库中项目下载到本地，再进行提交，也就是先<strong>更新再提交</strong>，不然就会出现如下错误，如图：<br><img src="https://image.charones.com/usr/uploads/2019/09/2980647582.png"><br>这就是版本不一致造成的，这时需要输入以下命令：</p>
-<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">git pull <span class="comment">--rebase origin master</span></span><br></pre></td></tr></table></figure>
-<p>作用：抓取并合并远程仓库到本地</p>
-<p>最后再执行上传命令则就成功将项目上传到GitHub仓库中<br>如图：<br><img src="https://image.charones.com/usr/uploads/2019/09/43087761.png"></p>
-<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>以上就是利用Git将本地项目上传到GitHub的过程，其实很早就用Git将项目上传到GitHub中了，但对这套流程一直没做过总结与记录，慢慢的有时会遗忘一些命令的使用，于是写下这篇文章作为记录，好记性不如烂笔头，以便日后查看与记忆。</p>
+<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>以上就是在非contoller层获取request和response对象的方法，也算是做一个笔记，防止日后有遗忘。</p>
 ]]></content>
       <categories>
-        <category>Git</category>
+        <category>SpringMVC</category>
       </categories>
       <tags>
-        <tag>Git</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SSM购物商城项目+后台管理</title>
-    <url>/archives/64.html</url>
-    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/10/1011996262.jpg"></p>
-<span id="more"></span>
-
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本项目是在学习SSM框架后的又一个产物，同时也是博主当年拿来当作毕业设计的项目，之前写的都是后台管理系统，写来写去千篇一律，于是乎就想写个另一种类型的项目，同时也是对自己所学知识的巩固，于是此项目就问世了。</p>
-<h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>此项目是一个买生鲜PC端的<strong>简单的</strong>商城项目，包含<strong>用户端</strong>和<strong>管理平台</strong>，至于为什么说它简单，是因为里面并没有完善的商城项目该有的功能，但基础的功能还是有的，其项目主要目的还是用来巩固自己所学的知识，毕竟光学不练假把式。</p>
-<h2 id="模块介绍"><a href="#模块介绍" class="headerlink" title="模块介绍"></a>模块介绍</h2><p><strong>用户端</strong></p>
-<ul>
-<li>登陆</li>
-<li>注册</li>
-<li>商品列表</li>
-<li>商品分类</li>
-<li>商品详情</li>
-<li>用户中心</li>
-<li>购物车</li>
-<li>我的的订单</li>
-<li>地址管理</li>
-<li>用户下单</li>
-<li>订单管理</li>
-</ul>
-<p><strong>管理平台</strong></p>
-<ul>
-<li>登陆</li>
-<li>类别管理</li>
-<li>商品管理</li>
-<li>订单管理</li>
-<li>会员管理</li>
-<li>地址管理</li>
-<li>系统设置</li>
-<li>权限管理</li>
-</ul>
-<h2 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h2><p><strong>后端</strong></p>
-<ul>
-<li>Spring</li>
-<li>SpirngMVC</li>
-<li>Mybatis</li>
-<li>Mysql</li>
-<li>Maven</li>
-<li>tomcat</li>
-<li>Log4j2</li>
-</ul>
-<p><strong>前端</strong></p>
-<ul>
-<li>html</li>
-<li>css</li>
-<li>Jquery</li>
-<li>Layui</li>
-<li>Ajax</li>
-</ul>
-<h2 id="项目截图"><a href="#项目截图" class="headerlink" title="项目截图"></a>项目截图</h2><h2 id="用户端"><a href="#用户端" class="headerlink" title="用户端"></a>用户端</h2><p><img src="https://image.charones.com/usr/uploads/2020/10/4249965181.png"></p>
-<p><img src="https://image.charones.com/usr/uploads/2020/10/1137716480.png"></p>
-<p><img src="https://image.charones.com/usr/uploads/2020/10/2359438592.png"></p>
-<p><img src="https://image.charones.com/usr/uploads/2020/10/3134085559.png"></p>
-<h2 id="管理端"><a href="#管理端" class="headerlink" title="管理端"></a>管理端</h2><p><img src="https://image.charones.com/usr/uploads/2020/10/2848771081.png"><br><img src="https://image.charones.com/usr/uploads/2020/10/2076109169.png"></p>
-<p><strong>部署教程(IDEA部署)：</strong></p>
-<p>1、先使用git将项目从Github克隆下来，直接可以使用IDEA直接克隆到本地并打开，如下图：<br><img src="https://image.charones.com/2022/Snipaste_2022-01-01_12-16-46.png"></p>
-<p>2、将项目中的 <strong>Shop.sql</strong>  放到数据库管理工具中执行，注意：本项目是基于<strong>Mysql5.x</strong>开发的，如果是高版本MySQL，需要自行测试，猜测应该是没什么问题的</p>
-<p>3、克隆到本地后，不用再进行任何其余的配置，包括Tomcat。(本项目使用的是基于maven内嵌的Tomcat7，因此不需要再另行配置)</p>
-<p>4、项目打开后，然后等加载maven成功后，可以通过IDEA工具右侧的<strong>maven快捷方式</strong>运行，如下图<br><img src="https://image.charones.com/2022/Snipaste_2022-01-01_14-33-34.png"><br>双击 <strong>tomcat:7run</strong> 即可运行</p>
-<p>PS：如果看不到这个功能，可以刷新一下maven配置，点击左上角的刷新图标，如下图<br><img src="https://image.charones.com/2022/Snipaste_2022-01-01_14-37-02.png"></p>
-<p><strong>运行后浏览器输入如下即可预览：</strong></p>
-<p>前台地址：<code>http://localhost:8888/Shop-SSM/shop-user/</code></p>
-<p>后台地址：<code>http://localhost:8888/Shop-SSM/admin/</code></p>
-<h2 id="获取源码"><a href="#获取源码" class="headerlink" title="获取源码"></a>获取源码</h2><p>地址：<a href="https://github.com/Snykta/Shop-SSM">https://github.com/Snykta/Shop-SSM</a></p>
-<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>此项目虽然没有完善的功能，但基础的该有的还是有的，页面虽然丑点(这不重要，手动狗头~~)，但功能是逻辑是正常的，对于初学SSM框架还是有或多或少的帮助的，当然也可以在此项目基础上进行完善，二次开发，这都是可以的。</p>
-<blockquote>
-<p>老骥伏枥，志在千里。</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>JavaWeb项目</category>
-      </categories>
-      <tags>
-        <tag>JavaWeb</tag>
+        <tag>SpringMVC</tag>
       </tags>
   </entry>
   <entry>
@@ -387,6 +268,47 @@
       </tags>
   </entry>
   <entry>
+    <title>使用git将本地源码上传到github</title>
+    <url>/archives/51.html</url>
+    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/09/3269077972.jpg"></p>
+<span id="more"></span>
+
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>大大小小的项目也做了很多项目，但一直都是在电脑本地存储，而今突然想把这些项目托管到github上，于是就整理了这篇文章，利用git将本地项目上传到GitHub仓库中。</p>
+<hr>
+<h2 id="Git简介"><a href="#Git简介" class="headerlink" title="Git简介"></a>Git简介</h2><p>Git是一个<strong>分布式</strong>版本控制系统，用于对项目的版本控制，当然也有<strong>集中式</strong>版本控制系统，比如：SVN。最初 Git 的开发是为了辅助 Linux 内核开发的过程，后来慢慢的在很多其他自由软件项目中也使用了 Git。</p>
+<h2 id="何为GitHub"><a href="#何为GitHub" class="headerlink" title="何为GitHub"></a>何为GitHub</h2><p>gitHub是国外的一个面向开源及私有软件项目的托管平台，因为只支持git 作为唯一的版本库格式进行托管，故名gitHub。国内的也有托管平台，比如：码云（Gitee）。</p>
+<h2 id="Github操作"><a href="#Github操作" class="headerlink" title="Github操作"></a><strong>Github操作</strong></h2><p>先在GitHub上创建一个项目，目的是用于把本地的项目上传到该远程仓库中，在此引用网上的一张图（看后一目了然）如下图：<br><img src="https://img-blog.csdn.net/20180704092925840?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L20wXzM3NzI1MDAz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+<h2 id="Git操作"><a href="#Git操作" class="headerlink" title="Git操作"></a><strong>Git操作</strong></h2><p><strong>第一步</strong><br>打开Git Bash，在命令行中cd进入项目目录中<br><img src="https://image.charones.com/usr/uploads/2019/09/562919979.png"><br>进入后输入命令：</p>
+<figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">init</span></span><br></pre></td></tr></table></figure>
+<p>作用：在当前项目的目录中生成本地的git管理（会在当前目录下多了一个.git文件夹）</p>
+<p><strong>第二步</strong><br>输入命令：</p>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">git <span class="builtin-name">add</span> .</span><br></pre></td></tr></table></figure>
+<p><img src="https://image.charones.com/usr/uploads/2019/09/181607367.png"><br>作用：将项目上所有的文件添加到仓库中的意思，如果想添加某个特定的文件，只需把.换成这个特定的文件名即可</p>
+<p><strong>第三步</strong><br>输入命令：</p>
+<figure class="highlight nginx"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git</span> commit -m <span class="string">&quot;提交更新&quot;</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://image.charones.com/usr/uploads/2019/09/830437848.png"><br>作用：表示你对这次提交的注释，双引号里面的内容可以根据个人的需要<br>改。</p>
+<p><em><strong>输入完后会出现输入自己的账号或者姓名的提示，如图：</strong></em></p>
+<p><img src="https://image.charones.com/usr/uploads/2019/09/3339086964.png"><br>这时用上面提示的代码输入自己的邮箱或名字。<br>如命令：</p>
+<figure class="highlight mipsasm"><table><tr><td class="code"><pre><span class="line">git remote <span class="keyword">add </span><span class="keyword">origin </span>&lt;远程github地址&gt;</span><br></pre></td></tr></table></figure>
+<p>&lt;&gt;中为远程地址，实际输入命令没有&lt;&gt;符号，后面直接跟地址</p>
+<p>输入后再输入git commit -m “提交更新”命令时就会成功。</p>
+<p><strong>第四步</strong><br>输入命令：</p>
+<figure class="highlight maxima"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">push</span> -u <span class="built_in">origin</span> master</span><br></pre></td></tr></table></figure>
+<p><img src="https://image.charones.com/usr/uploads/2019/09/252055681.png"><br>作用：将本地项目上传到远程GitHub仓库中<br>这是如果在远程项目中有存在的文件，则需要先将远程仓库中项目下载到本地，再进行提交，也就是先<strong>更新再提交</strong>，不然就会出现如下错误，如图：<br><img src="https://image.charones.com/usr/uploads/2019/09/2980647582.png"><br>这就是版本不一致造成的，这时需要输入以下命令：</p>
+<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">git pull <span class="comment">--rebase origin master</span></span><br></pre></td></tr></table></figure>
+<p>作用：抓取并合并远程仓库到本地</p>
+<p>最后再执行上传命令则就成功将项目上传到GitHub仓库中<br>如图：<br><img src="https://image.charones.com/usr/uploads/2019/09/43087761.png"></p>
+<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>以上就是利用Git将本地项目上传到GitHub的过程，其实很早就用Git将项目上传到GitHub中了，但对这套流程一直没做过总结与记录，慢慢的有时会遗忘一些命令的使用，于是写下这篇文章作为记录，好记性不如烂笔头，以便日后查看与记忆。</p>
+]]></content>
+      <categories>
+        <category>Git</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>IDEA下创建maven聚合工程</title>
     <url>/archives/66.html</url>
     <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/11/710888379.jpg"></p>
@@ -417,6 +339,84 @@
       <tags>
         <tag>maven</tag>
         <tag>IDEA</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSM购物商城项目+后台管理</title>
+    <url>/archives/64.html</url>
+    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2019/10/1011996262.jpg"></p>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本项目是在学习SSM框架后的又一个产物，同时也是博主当年拿来当作毕业设计的项目，之前写的都是后台管理系统，写来写去千篇一律，于是乎就想写个另一种类型的项目，同时也是对自己所学知识的巩固，于是此项目就问世了。</p>
+<h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>此项目是一个买生鲜PC端的<strong>简单的</strong>商城项目，包含<strong>用户端</strong>和<strong>管理平台</strong>，至于为什么说它简单，是因为里面并没有完善的商城项目该有的功能，但基础的功能还是有的，其项目主要目的还是用来巩固自己所学的知识，毕竟光学不练假把式。</p>
+<h2 id="模块介绍"><a href="#模块介绍" class="headerlink" title="模块介绍"></a>模块介绍</h2><p><strong>用户端</strong></p>
+<ul>
+<li>登陆</li>
+<li>注册</li>
+<li>商品列表</li>
+<li>商品分类</li>
+<li>商品详情</li>
+<li>用户中心</li>
+<li>购物车</li>
+<li>我的的订单</li>
+<li>地址管理</li>
+<li>用户下单</li>
+<li>订单管理</li>
+</ul>
+<p><strong>管理平台</strong></p>
+<ul>
+<li>登陆</li>
+<li>类别管理</li>
+<li>商品管理</li>
+<li>订单管理</li>
+<li>会员管理</li>
+<li>地址管理</li>
+<li>系统设置</li>
+<li>权限管理</li>
+</ul>
+<h2 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h2><p><strong>后端</strong></p>
+<ul>
+<li>Spring</li>
+<li>SpirngMVC</li>
+<li>Mybatis</li>
+<li>Mysql</li>
+<li>Maven</li>
+<li>tomcat</li>
+<li>Log4j2</li>
+</ul>
+<p><strong>前端</strong></p>
+<ul>
+<li>html</li>
+<li>css</li>
+<li>Jquery</li>
+<li>Layui</li>
+<li>Ajax</li>
+</ul>
+<h2 id="项目截图"><a href="#项目截图" class="headerlink" title="项目截图"></a>项目截图</h2><h2 id="用户端"><a href="#用户端" class="headerlink" title="用户端"></a>用户端</h2><p><img src="https://image.charones.com/usr/uploads/2020/10/4249965181.png"></p>
+<p><img src="https://image.charones.com/usr/uploads/2020/10/1137716480.png"></p>
+<p><img src="https://image.charones.com/usr/uploads/2020/10/2359438592.png"></p>
+<p><img src="https://image.charones.com/usr/uploads/2020/10/3134085559.png"></p>
+<h2 id="管理端"><a href="#管理端" class="headerlink" title="管理端"></a>管理端</h2><p><img src="https://image.charones.com/usr/uploads/2020/10/2848771081.png"><br><img src="https://image.charones.com/usr/uploads/2020/10/2076109169.png"></p>
+<p><strong>部署教程(IDEA部署)：</strong></p>
+<p>1、先使用git将项目从Github克隆下来，直接可以使用IDEA直接克隆到本地并打开，如下图：<br><img src="https://image.charones.com/2022/Snipaste_2022-01-01_12-16-46.png"></p>
+<p>2、将项目中的 <strong>Shop.sql</strong>  放到数据库管理工具中执行，注意：本项目是基于<strong>Mysql5.x</strong>开发的，如果是高版本MySQL，需要自行测试，猜测应该是没什么问题的</p>
+<p>3、克隆到本地后，不用再进行任何其余的配置(<strong>开箱即可食用，不用多余配置</strong>)，包括Tomcat。(本项目使用的是基于maven内嵌的Tomcat7，因此不需要再另行配置)</p>
+<p>4、项目打开后，然后等加载maven成功后，可以通过IDEA工具右侧的<strong>maven快捷方式</strong>运行，如下图<br><img src="https://image.charones.com/2022/Snipaste_2022-01-01_14-33-34.png"><br>双击 <strong>tomcat:7run</strong> 即可运行</p>
+<p>PS：如果看不到这个功能，可以刷新一下maven配置，点击左上角的刷新图标，如下图<br><img src="https://image.charones.com/2022/Snipaste_2022-01-01_14-37-02.png"></p>
+<p><strong>运行后浏览器输入如下即可预览：</strong></p>
+<p>前台地址：<code>http://localhost:8888/Shop-SSM/shop-user/</code></p>
+<p>后台地址：<code>http://localhost:8888/Shop-SSM/admin/</code></p>
+<h2 id="获取源码"><a href="#获取源码" class="headerlink" title="获取源码"></a>获取源码</h2><p>地址：<a href="https://github.com/Snykta/Shop-SSM">https://github.com/Snykta/Shop-SSM</a></p>
+<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>此项目虽然没有完善的功能，但基础的该有的还是有的，页面虽然丑点(这不重要，手动狗头~~)，但功能是逻辑是正常的，对于初学SSM框架还是有或多或少的帮助的，当然也可以在此项目基础上进行完善，二次开发，这都是可以的。</p>
+<blockquote>
+<p>老骥伏枥，志在千里。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>JavaWeb项目</category>
+      </categories>
+      <tags>
+        <tag>JavaWeb</tag>
       </tags>
   </entry>
   <entry>
@@ -467,19 +467,54 @@
       </tags>
   </entry>
   <entry>
-    <title>记录一次关于MybatisPlus枚举类映射的异常</title>
-    <url>/archives/88.html</url>
-    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2020/04/3037443624.jpg"></p>
+    <title>Docker安装Mysql并挂载目录后运行</title>
+    <url>/archives/104.html</url>
+    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2020/10/3405473456.png"></p>
 <span id="more"></span>
 
-<p><strong>待更新….</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>记一次MySql数据库读写分离的的功能，其中里面涉及到了数据库的主从复制，并且是在Docker中的运行的MySql实例，于是乎就写下这篇文章，记录在Docker中安装MySql的步骤。</p>
+<h2 id="一、拉取镜像"><a href="#一、拉取镜像" class="headerlink" title="一、拉取镜像"></a>一、拉取镜像</h2><p>1、执行如下命令拉取镜像：<br>本次使用的版本号是8.0.18</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker pull mysql:8.0.18</span><br></pre></td></tr></table></figure>
+<p><strong>提示：</strong>记得配置镜像加速器，否则拉取镜像将非常慢，原因你懂的。</p>
+<p>2、查看镜像是否存在：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、配置并运行容器"><a href="#二、配置并运行容器" class="headerlink" title="二、配置并运行容器"></a>二、配置并运行容器</h2><p>1、运行容器：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -d -p 3308:3306 --name mysql-server-01 -e MYSQL_ROOT_PASSWORD=&quot;123456&quot; mysql:8.0.18</span><br></pre></td></tr></table></figure>
+<p>2、查看是否运行成功</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
+<p>如图所示则成功：<br><img src="https://image.charones.com/usr/uploads/2020/10/2194755708.png"></p>
+<p>3、进入容器：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it mysql-server-01 bash</span><br></pre></td></tr></table></figure>
+<p><strong>提示：</strong>mysql-server-01就是运行时设置的容器名称</p>
+<p>4、查看容器内mysql配置文件路径</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mysql --help | grep my.cnf</span><br></pre></td></tr></table></figure>
+<p>如图：<img src="https://image.charones.com/usr/uploads/2020/10/1746848017.png"></p>
+<p>5、复制配置文件到宿主机目录<br>找到容器路径后，退出容器(ctrl+d)，在<strong>宿主机</strong>下执行如下命令</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker cp mysql-server-01:/etc/mysql/my.cnf /mydocker/mysql-server-docker/mysql-01/conf</span><br></pre></td></tr></table></figure>
+<p><strong>提示：</strong>宿主机路径位置一定要创建好</p>
+<p>6、重新运行容器<br>配置好配置文件后，重新运行容器，将容器的配置文件指向宿主机的配置文件<br>执行如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run --restart=always --privileged=true -d -v /mydocker/mysql-server-docker/mysql-01/data/:/var/lib/mysql -v /mydocker/mysql-server-docker/mysql-01/conf/my.cnf:/etc/mysql/my.cnf -p 3308:3306 --name mysql-server-01 -e MYSQL_ROOT_PASSWORD=&quot;123456&quot; mysql:8.0.18</span><br></pre></td></tr></table></figure>
+<p><strong>提示：</strong>运行新容器时记得删除就容器，或者不删除，但容器名字不能相同，端口号不能被占用！！</p>
+<h2 id="三、测试连接"><a href="#三、测试连接" class="headerlink" title="三、测试连接"></a>三、测试连接</h2><p>1、进行容器，开启远程访问<br>执行如下命令连接mysql：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysql -uroot -p123456</span><br></pre></td></tr></table></figure>
+
+<p>2、进入名字为mysql的库</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">use mysql</span><br></pre></td></tr></table></figure>
+<p>3、配置远程访问</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">UPDATE user SET `Host` = &#x27;%&#x27; WHERE `User` = &#x27;root&#x27; LIMIT 1;</span><br></pre></td></tr></table></figure>
+<p>4、刷新生效</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+<p>5、连接成功<br><img src="https://image.charones.com/usr/uploads/2020/10/3462937496.png"></p>
+<h2 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h2><p>以上就是在Docker中安装MySql的步骤，可以配置集群，主从复制等，如果测试连接不上，可以检查以下：端口是否开放，端口是否被占用，映射是否成功，容器是否运行，安全组或者防火墙是否打开等这几处来检测。</p>
 ]]></content>
       <categories>
-        <category>MybatisPlus</category>
+        <category>Docker</category>
+        <category>MySql</category>
       </categories>
       <tags>
-        <tag>SpringBoot</tag>
-        <tag>MybatisPlus</tag>
+        <tag>Docker</tag>
+        <tag>MySql</tag>
       </tags>
   </entry>
   <entry>
@@ -532,54 +567,19 @@
       </tags>
   </entry>
   <entry>
-    <title>Docker安装Mysql并挂载目录后运行</title>
-    <url>/archives/104.html</url>
-    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2020/10/3405473456.png"></p>
+    <title>记录一次关于MybatisPlus枚举类映射的异常</title>
+    <url>/archives/88.html</url>
+    <content><![CDATA[<p><img src="https://image.charones.com/usr/uploads/2020/04/3037443624.jpg"></p>
 <span id="more"></span>
 
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>记一次MySql数据库读写分离的的功能，其中里面涉及到了数据库的主从复制，并且是在Docker中的运行的MySql实例，于是乎就写下这篇文章，记录在Docker中安装MySql的步骤。</p>
-<h2 id="一、拉取镜像"><a href="#一、拉取镜像" class="headerlink" title="一、拉取镜像"></a>一、拉取镜像</h2><p>1、执行如下命令拉取镜像：<br>本次使用的版本号是8.0.18</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker pull mysql:8.0.18</span><br></pre></td></tr></table></figure>
-<p><strong>提示：</strong>记得配置镜像加速器，否则拉取镜像将非常慢，原因你懂的。</p>
-<p>2、查看镜像是否存在：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
-
-<h2 id="二、配置并运行容器"><a href="#二、配置并运行容器" class="headerlink" title="二、配置并运行容器"></a>二、配置并运行容器</h2><p>1、运行容器：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -d -p 3308:3306 --name mysql-server-01 -e MYSQL_ROOT_PASSWORD=&quot;123456&quot; mysql:8.0.18</span><br></pre></td></tr></table></figure>
-<p>2、查看是否运行成功</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
-<p>如图所示则成功：<br><img src="https://image.charones.com/usr/uploads/2020/10/2194755708.png"></p>
-<p>3、进入容器：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker exec -it mysql-server-01 bash</span><br></pre></td></tr></table></figure>
-<p><strong>提示：</strong>mysql-server-01就是运行时设置的容器名称</p>
-<p>4、查看容器内mysql配置文件路径</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mysql --help | grep my.cnf</span><br></pre></td></tr></table></figure>
-<p>如图：<img src="https://image.charones.com/usr/uploads/2020/10/1746848017.png"></p>
-<p>5、复制配置文件到宿主机目录<br>找到容器路径后，退出容器(ctrl+d)，在<strong>宿主机</strong>下执行如下命令</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker cp mysql-server-01:/etc/mysql/my.cnf /mydocker/mysql-server-docker/mysql-01/conf</span><br></pre></td></tr></table></figure>
-<p><strong>提示：</strong>宿主机路径位置一定要创建好</p>
-<p>6、重新运行容器<br>配置好配置文件后，重新运行容器，将容器的配置文件指向宿主机的配置文件<br>执行如下命令：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run --restart=always --privileged=true -d -v /mydocker/mysql-server-docker/mysql-01/data/:/var/lib/mysql -v /mydocker/mysql-server-docker/mysql-01/conf/my.cnf:/etc/mysql/my.cnf -p 3308:3306 --name mysql-server-01 -e MYSQL_ROOT_PASSWORD=&quot;123456&quot; mysql:8.0.18</span><br></pre></td></tr></table></figure>
-<p><strong>提示：</strong>运行新容器时记得删除就容器，或者不删除，但容器名字不能相同，端口号不能被占用！！</p>
-<h2 id="三、测试连接"><a href="#三、测试连接" class="headerlink" title="三、测试连接"></a>三、测试连接</h2><p>1、进行容器，开启远程访问<br>执行如下命令连接mysql：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysql -uroot -p123456</span><br></pre></td></tr></table></figure>
-
-<p>2、进入名字为mysql的库</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">use mysql</span><br></pre></td></tr></table></figure>
-<p>3、配置远程访问</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">UPDATE user SET `Host` = &#x27;%&#x27; WHERE `User` = &#x27;root&#x27; LIMIT 1;</span><br></pre></td></tr></table></figure>
-<p>4、刷新生效</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
-<p>5、连接成功<br><img src="https://image.charones.com/usr/uploads/2020/10/3462937496.png"></p>
-<h2 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h2><p>以上就是在Docker中安装MySql的步骤，可以配置集群，主从复制等，如果测试连接不上，可以检查以下：端口是否开放，端口是否被占用，映射是否成功，容器是否运行，安全组或者防火墙是否打开等这几处来检测。</p>
+<p><strong>待更新….</strong></p>
 ]]></content>
       <categories>
-        <category>Docker</category>
-        <category>MySql</category>
+        <category>MybatisPlus</category>
       </categories>
       <tags>
-        <tag>Docker</tag>
-        <tag>MySql</tag>
+        <tag>SpringBoot</tag>
+        <tag>MybatisPlus</tag>
       </tags>
   </entry>
 </search>
