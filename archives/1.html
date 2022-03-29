@@ -62,7 +62,7 @@
 
 
 
-  <meta name="keywords" content="十七博客,微服务,java,SpringBoot项目,JavaWeb,运维,框架,SSM,Python,Spring,linux,Mysql,数据库,SpringCloud,PostgreSql" />
+  <meta name="keywords" content="Java," />
 
 
 
@@ -75,16 +75,18 @@
 
 
 
-<meta name="description" content="Just Do It">
-<meta property="og:type" content="website">
-<meta property="og:title" content="十七&#39;s Blog">
-<meta property="og:url" content="https://charones.com/categories/Docker/MySql/%E6%9C%8D%E5%8A%A1%E6%90%AD%E5%BB%BA/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JDK8新特性之Stream流的常用方法">
+<meta property="og:url" content="https://charones.com/archives/1.html">
 <meta property="og:site_name" content="十七&#39;s Blog">
-<meta property="og:description" content="Just Do It">
 <meta property="og:locale">
+<meta property="og:image" content="https://image.charones.com/2022/03/202203282055047.jpg">
+<meta property="article:published_time" content="2022-03-26T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-29T13:40:10.615Z">
 <meta property="article:author" content="十七">
-<meta property="article:tag" content="十七博客,微服务,java,SpringBoot项目,JavaWeb,运维,框架,SSM,Python,Spring,linux,Mysql,数据库,SpringCloud,PostgreSql">
+<meta property="article:tag" content="Java">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.charones.com/2022/03/202203282055047.jpg">
 
 
 
@@ -114,13 +116,13 @@
 
 
 
-  <link rel="canonical" href="https://charones.com/categories/Docker/MySql/服务搭建/"/>
+  <link rel="canonical" href="https://charones.com/archives/1.html"/>
 
 
 
 
 
-  <title>分类: 服务搭建 | 十七's Blog</title>
+  <title>JDK8新特性之Stream流的常用方法 | 十七's Blog</title>
   
 
 
@@ -139,7 +141,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -297,55 +299,226 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block category">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h2>服务搭建<small>分类</small>
-        </h2>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://charones.com/archives/1.html">
 
-      <h3 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="十七">
+      <meta itemprop="description" content="长亭外">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十七's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/archives/101.html" itemprop="url">
-              
-                <span itemprop="name">MySql数据库实现主从复制</span>
-              
-            </a>
         
-      </h3>
+          <h2 class="post-title" itemprop="name headline">JDK8新特性之Stream流的常用方法</h2>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2020-10-20T00:00:00+08:00"
-              content="2020-10-20" >
-          10-20
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-03-27T00:00:00+08:00">
+                2022-03-27
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                   <a rel="nofollow" href="/archives/1.html">9999+条评论</a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://image.charones.com/2022/03/202203282055047.jpg"></p>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>众所周知，在Jdk1.8中包含了很多的新特性，例如： <strong>Lambda表达式</strong> 、<strong>接口的默认方法和静态方法</strong>、<strong>方法引用</strong>、<strong>Optional</strong>、<strong>Stream</strong>等很多的新特性或者语法糖，而今天这篇文章着重讲解一下  <strong>Stream</strong>  流相关的常用方法。</p>
+<h2 id="何为Stream流"><a href="#何为Stream流" class="headerlink" title="何为Stream流"></a>何为Stream流</h2><ul>
+<li>Java 8 API添加了一个新的抽象称为流Stream，可以让你以一种声明的方式处理数据。</li>
+<li>Stream 使用一种类似用 SQL 语句从数据库查询数据的直观方式来提供一种对 Java 集合运算和表达的高阶抽象。</li>
+<li>Stream API可以极大提高Java程序员的生产力，让程序员写出高效率、干净、简洁的代码。</li>
+<li>这种风格将要处理的元素集合看作一种流， 流在管道中传输， 并且可以在管道的节点上进行处理， 比如筛选， 排序，聚合等。</li>
+<li>元素流在管道中经过中间操作（intermediate operation）的处理，最后由最终操作(terminal operation)得到前面处理的结果。</li>
+</ul>
+<h2 id="案例集锦"><a href="#案例集锦" class="headerlink" title="案例集锦"></a>案例集锦</h2><p><em>注意</em>一：<strong>首先我们先预先定义一个实体类，Student类，里面有姓名、年龄等若干个属性，而下面的所有案例全都基于此实体类做讲解！</strong></p>
+<p><em>注意二</em>：<strong>根据这个实体类，我们new出三个学生对象，并设置各自的属性，然后添加到了<code>studentList</code> 集合中，以下所有案例，全部基于此集合讲解！</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 姓名</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="comment">// 年龄</span></span><br><span class="line">    <span class="keyword">private</span> Integer age;</span><br><span class="line">    <span class="comment">// 性别 1-男 0-女</span></span><br><span class="line">    <span class="keyword">private</span> Short sex;</span><br><span class="line">    <span class="comment">// 体重 单位-g</span></span><br><span class="line">    <span class="keyword">private</span> BigDecimal weight;</span><br><span class="line">    <span class="comment">// 爱好</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;String&gt; likeList;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ....忽略get/set，自己测试请记得添加</span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 学生对象集合</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> List&lt;Student&gt; studentList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="comment">// 往集合添加数据</span></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        Student student1 = <span class="keyword">new</span> Student();</span><br><span class="line">        student1.setName(<span class="string">&quot;小明&quot;</span>);</span><br><span class="line">        student1.setAge(<span class="number">15</span>);</span><br><span class="line">        student1.setSex(Short.parseShort(<span class="string">&quot;1&quot;</span>));</span><br><span class="line">        student1.setWeight(<span class="keyword">new</span> BigDecimal(<span class="string">&quot;60&quot;</span>));</span><br><span class="line">       	student1.setLikeList(Arrays.asList(<span class="string">&quot;羽毛球&quot;</span>,<span class="string">&quot;篮球&quot;</span>));</span><br><span class="line"></span><br><span class="line">        Student student2 = <span class="keyword">new</span> Student();</span><br><span class="line">        student2.setName(<span class="string">&quot;小明&quot;</span>);</span><br><span class="line">        student2.setAge(<span class="number">18</span>);</span><br><span class="line">        student2.setSex(Short.parseShort(<span class="string">&quot;1&quot;</span>));</span><br><span class="line">        student2.setWeight(<span class="keyword">new</span> BigDecimal(<span class="string">&quot;65&quot;</span>));</span><br><span class="line">        student2.setLikeList(Arrays.asList(<span class="string">&quot;排球&quot;</span>,<span class="string">&quot;足球&quot;</span>));</span><br><span class="line"></span><br><span class="line">        Student student3 = <span class="keyword">new</span> Student();</span><br><span class="line">        student3.setName(<span class="string">&quot;小红&quot;</span>);</span><br><span class="line">        student3.setAge(<span class="number">10</span>);</span><br><span class="line">        student3.setSex(Short.parseShort(<span class="string">&quot;0&quot;</span>));</span><br><span class="line">        student3.setWeight(<span class="keyword">new</span> BigDecimal(<span class="string">&quot;55&quot;</span>));</span><br><span class="line">        student3.setLikeList(Arrays.asList(<span class="string">&quot;足球&quot;</span>,<span class="string">&quot;乒乓球&quot;</span>));</span><br><span class="line"></span><br><span class="line">        studentList.add(student1);</span><br><span class="line">        studentList.add(student2);</span><br><span class="line">        studentList.add(student3);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>1、只单取出姓名属性并去重返回结果</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; nameList = studentList.stream().map(Student::getName).distinct().collect(Collectors.toList());</span><br><span class="line">System.out.println(nameList);</span><br></pre></td></tr></table></figure>
+
+<p><strong>2、取出年龄最大的学生</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Student student = studentList.stream().max(Comparator.comparing(Student::getAge)).orElse(<span class="keyword">null</span>);</span><br><span class="line">System.out.println(student);</span><br></pre></td></tr></table></figure>
+
+<p><strong>3、计算出性别为男(sex == 1)的学生总数</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">long</span> count = studentList.stream().filter(e -&gt; e.getSex().equals(Short.parseShort(<span class="string">&quot;1&quot;</span>))).count();</span><br><span class="line">System.out.println(count);</span><br></pre></td></tr></table></figure>
+
+<p><strong>4、分别计算体重和年龄的总和</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 体重总和</span></span><br><span class="line">BigDecimal weightSum = studentList.stream().map(Student::getWeight).reduce(BigDecimal.ZERO, BigDecimal::add);</span><br><span class="line"><span class="comment">// 年龄总和</span></span><br><span class="line"><span class="keyword">int</span> ageSum = studentList.stream().mapToInt(Student::getAge).sum();</span><br></pre></td></tr></table></figure>
+
+<p><strong>5、根据年龄正序从小到大排序，如果年龄属性为null，则排末尾</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Student&gt; collect = studentList.stream().sorted(Comparator.comparing(Student::getAge, Comparator.nullsLast(Integer::compareTo))).collect(Collectors.toList());</span><br><span class="line">System.out.println(collect);</span><br></pre></td></tr></table></figure>
+
+<p><strong>6、根据姓名分组，并计算每个姓名下的体重和年龄总和</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 每组体重总和</span></span><br><span class="line">Map&lt;String, BigDecimal&gt; groupObj1 = studentList.stream().collect(Collectors.groupingBy(Student::getName, Collectors.mapping(Student::getWeight, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));</span><br><span class="line"><span class="comment">// 每组年龄总和</span></span><br><span class="line">Map&lt;String, Integer&gt; groupObj2 = studentList.stream().collect(Collectors.groupingBy(Student::getName, Collectors.mapping(Student::getAge,Collectors.reducing(<span class="number">0</span>, Integer::sum))));</span><br></pre></td></tr></table></figure>
+
+<p><strong>7、根据多个条件进行分组</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;List&lt;Object&gt;, List&lt;Student&gt;&gt; groupObj = studentList.stream().collect(Collectors.groupingBy(e -&gt; &#123;</span><br><span class="line">        <span class="keyword">return</span> Arrays.asList(e.getName(), e.getAge());</span><br><span class="line">&#125;));</span><br><span class="line"><span class="comment">// PS: 也可也使用拼接写法，不用list接收</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>8、将集合中的姓名属性为维度进行去重并返回新集合</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ArrayList&lt;Student&gt; collect = studentList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -&gt; <span class="keyword">new</span> TreeSet&lt;&gt;(Comparator.comparing(Student::getName))), ArrayList::<span class="keyword">new</span>));</span><br></pre></td></tr></table></figure>
+
+<p><strong>9、将集合中年龄当作key，姓名当作value重新组装返回Map类型</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Integer, String&gt; collect = studentList.stream().collect(Collectors.toMap(Student::getAge, Student::getName));</span><br></pre></td></tr></table></figure>
+
+<p><strong>10、根据姓名分组，且取出每组中体重最重的那位学生</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Student&gt; groupMax = studentList.stream().collect(Collectors.toMap(Student::getName,</span><br><span class="line">        Function.identity(), (c1, c2) -&gt; c1.getWeight().compareTo(c2.getWeight()) &gt; <span class="number">0</span> ? c1 : c2));</span><br><span class="line">System.out.println(groupMax);</span><br></pre></td></tr></table></figure>
+
+<p><strong>11、将学生集合(studentList)中的爱好likeList集合属性的提取成一个单独list并去重</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; likeList = studentList.stream().flatMap(x -&gt; x.getLikeList().stream()).distinct().collect(Collectors.toList());</span><br><span class="line">System.out.println(likeList);</span><br></pre></td></tr></table></figure>
+
+<p><strong>12、根据姓名分组求分组体重之和，然后再根据value倒叙排序map</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, BigDecimal&gt; groupObj = studentList.stream().collect(Collectors.groupingBy(Student::getName, Collectors.mapping(Student::getWeight, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));</span><br><span class="line"><span class="comment">// 排序前值</span></span><br><span class="line">System.out.println(groupObj);</span><br><span class="line"><span class="comment">// 开始排序</span></span><br><span class="line">Map&lt;String, BigDecimal&gt; result = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line">Comparator&lt;Map.Entry&lt;String, BigDecimal&gt;&gt; entryComparator = Map.Entry.comparingByValue();</span><br><span class="line">entryComparator = entryComparator.reversed();</span><br><span class="line">groupObj.entrySet().stream().sorted(entryComparator.reversed()).forEachOrdered(e -&gt; result.put(e.getKey(), e.getValue()));</span><br><span class="line"><span class="comment">// 根据value排序后的值</span></span><br><span class="line">System.out.println(result);</span><br></pre></td></tr></table></figure>
+
+<h2 id="讲在末尾"><a href="#讲在末尾" class="headerlink" title="讲在末尾"></a>讲在末尾</h2><p>以上就是Jdk1.8中新特性之 <strong>Stream</strong> 流的以下常用方法，Stream流在实际开发业务中其实用的场景非常之多，好记性不如烂笔头，因此写下这篇博文，以防止遗忘，或许对我对你对他都有帮助。</p>
 
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/101.html" rel="next" title="MySql数据库实现主从复制">
+                <i class="fa fa-chevron-left"></i> MySql数据库实现主从复制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -353,6 +526,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -373,8 +550,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -445,6 +631,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E4%B8%BAStream%E6%B5%81"><span class="nav-number">2.</span> <span class="nav-text">何为Stream流</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B%E9%9B%86%E9%94%A6"><span class="nav-number">3.</span> <span class="nav-text">案例集锦</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%B2%E5%9C%A8%E6%9C%AB%E5%B0%BE"><span class="nav-number">4.</span> <span class="nav-text">讲在末尾</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -579,6 +781,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 

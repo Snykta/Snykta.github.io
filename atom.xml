@@ -6,7 +6,7 @@
     <link href="https://charones.com/atom.xml" rel="self"/>
     
     <link href="https://charones.com/"/>
-    <updated>2021-05-20T13:50:49.884Z</updated>
+    <updated>2022-03-29T13:40:10.615Z</updated>
     <id>https://charones.com/</id>
     
     <author>
@@ -15,6 +15,25 @@
     </author>
     
     <generator uri="https://charones.com/">十七's Blog</generator>
+    
+    <entry>
+        <title>JDK8新特性之Stream流的常用方法</title>
+        <link href="https://charones.com/archives/1.html"/>
+        <id>https://charones.com/archives/1.html</id>
+        <published>2022-03-26T16:00:00.000Z</published>
+        <updated>2022-03-29T13:40:10.615Z</updated>
+        
+        
+        <summary type="html">&lt;p&gt;&lt;img src=&quot;https://image.charones.com/2022/03/202203282055047.jpg&quot;&gt;&lt;/p&gt;</summary>
+        
+        
+        
+        <category term="Java" scheme="https://charones.com/categories/Java/"/>
+        
+        
+        <category term="Java" scheme="https://charones.com/tags/Java/"/>
+        
+    </entry>
     
     <entry>
         <title>MySql数据库实现主从复制</title>
