@@ -107,27 +107,6 @@
     </entry>
     
     <entry>
-        <title>记录一次关于MybatisPlus枚举类映射的异常</title>
-        <link href="https://charones.com/archives/88.html"/>
-        <id>https://charones.com/archives/88.html</id>
-        <published>2020-04-09T16:00:00.000Z</published>
-        <updated>2022-03-29T13:52:53.519Z</updated>
-        
-        
-        <summary type="html">&lt;p&gt;&lt;img src=&quot;https://image.charones.com/usr/uploads/2020/04/3037443624.jpg&quot;&gt;&lt;/p&gt;</summary>
-        
-        
-        
-        <category term="MybatisPlus" scheme="https://charones.com/categories/MybatisPlus/"/>
-        
-        
-        <category term="SpringBoot" scheme="https://charones.com/tags/SpringBoot/"/>
-        
-        <category term="MybatisPlus" scheme="https://charones.com/tags/MybatisPlus/"/>
-        
-    </entry>
-    
-    <entry>
         <title>Redisson实现订单超时自动关闭(高可用)</title>
         <link href="https://charones.com/archives/86.html"/>
         <id>https://charones.com/archives/86.html</id>
