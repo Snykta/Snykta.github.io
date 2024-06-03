@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+
+
+
+
+  <meta name="keywords" content="SpringBoot,Java,SpringCloud," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="十七's Blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringCloud集成Seata实现分布式事务管理">
+<meta property="og:url" content="https://charones.com/archives/20240601001.html">
+<meta property="og:site_name" content="十七&#39;s Blog">
+<meta property="og:locale">
+<meta property="og:image" content="https://image.charones.com/2024/05/202405292207787.jpg">
+<meta property="article:published_time" content="2024-06-01T10:00:00.000Z">
+<meta property="article:modified_time" content="2024-06-03T04:03:20.215Z">
+<meta property="article:author" content="十七">
+<meta property="article:tag" content="SpringBoot">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="SpringCloud">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.charones.com/2024/05/202405292207787.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://charones.com/archives/20240601001.html"/>
+
+
+
+
+
+  <title>SpringCloud集成Seata实现分布式事务管理 | 十七's Blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">十七's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Just Do It</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-users"></i> <br />
+            
+            友邻
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-architecture">
+          <a href="/architecture/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-architecture"></i> <br />
+            
+            架构
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://charones.com/archives/20240601001.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="十七">
+      <meta itemprop="description" content="长亭外">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十七's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">SpringCloud集成Seata实现分布式事务管理</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-06-01T10:00:00+00:00">
+                2024-06-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/SpringBoot/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringBoot</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/SpringBoot/SpringCloud/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringCloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                   <a rel="nofollow" href="/archives/20240601001.html">9999+条评论</a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://image.charones.com/2024/05/202405292207787.jpg"></p>
+<span id="more"></span>
+
+
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>事务是保证数据一致性，准确性的重要保证。以spring举例，在单体项目中常用的是注解式事务，例如在service方法上添加 <strong>@Transactional(rollbackFor = Exception.class)</strong> 注解即可。而当我们业务复杂，数据量大时候，我们就不得不拆分服务，当拆分服务后，每个功能模块都是一个独立运行的服务，这时候我们又该如何处理事务呢？如何保证服务与服务之间的数据一致性呢？</p>
+<h2 id="何为数据库事务"><a href="#何为数据库事务" class="headerlink" title="何为数据库事务"></a>何为数据库事务</h2><p>数据库事务（Database Transaction）是指作为单个逻辑工作单元执行的一组数据库操作，这些操作要么全部成功完成并永久保存，要么全部失败并回滚到最初状态，以确保数据库的一致性和完整性。</p>
+<p>事务具有以下四个特性，通常缩写为 ACID：</p>
+<ol>
+<li><strong>原子性（Atomicity）</strong>：事务被视为不可分割的工作单元，要么全部执行成功，要么全部失败回滚。如果事务中的任何一部分操作失败，整个事务都会被回滚到初始状态。</li>
+<li><strong>一致性（Consistency）</strong>：事务的执行将数据库从一致状态转移到另一个一致状态，即事务执行前后数据库的完整性约束没有被破坏。</li>
+<li><strong>隔离性（Isolation）</strong>：多个事务并发执行时，每个事务的操作应该被隔离，互不干扰。这意味着一个事务的中间状态对其他事务是不可见的，直到事务提交。</li>
+<li><strong>持久性（Durability）</strong>：一旦事务提交，其所做的修改将永久保存在数据库中，并不会因为系统故障或其他因素而丢失。</li>
+</ol>
+<p>通过事务，可以确保数据库操作的完整性和一致性，避免数据损坏或丢失。数据库管理系统使用事务来保证数据的可靠性，并提供回滚和提交操作来管理事务的执行。</p>
+<h2 id="何为分布式事务"><a href="#何为分布式事务" class="headerlink" title="何为分布式事务"></a>何为分布式事务</h2><p>分布式事务是指涉及多个独立数据库或应用程序之间的事务操作，这些数据库或应用程序分布在不同的计算机或服务器上。分布式事务需要确保跨多个节点的事务操作具有ACID属性，保证数据的一致性和完整性。</p>
+<p><strong>通俗来讲：</strong>就是把上面的单体事务连接成多个事务且保证一致。单个变多个，听着简单实际大有搞头。</p>
+<h2 id="何为Seata"><a href="#何为Seata" class="headerlink" title="何为Seata"></a>何为Seata</h2><p>Seata 是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。2023 年 10 月阿里和蚂蚁集团正式将 Seata 捐赠给 Apache 基金会。</p>
+<h2 id="部署Seata服务端"><a href="#部署Seata服务端" class="headerlink" title="部署Seata服务端"></a>部署Seata服务端</h2><p><strong>1、首先使用docker命令临时启动一个seata容器</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 8091:8091 -p 7091:7091  --name seata-server-test seataio/seata-server:latest</span><br></pre></td></tr></table></figure>
+
+<p><strong>2、将此容器启动后内部的配置文件copy出来放到宿主机中，方便后面使用</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker cp seata-server-test:/seata-server/resources /home/seata/data</span><br></pre></td></tr></table></figure>
+
+<p><strong>3、删除上面创建的临时容器</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm -f seata-server-test</span><br></pre></td></tr></table></figure>
+
+<p><strong>4、创建docker-compose.yml。其中/seata-server/resources映射的目录就是第一步copy出来的目录</strong></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3.1&quot;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">seata-server:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">seataio/seata-server:1.6.1</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">seata-server</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;7091:7091&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8091:8091&quot;</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;/usr/share/zoneinfo/Asia/Shanghai:/etc/localtime&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;/usr/share/zoneinfo/Asia/Shanghai:/etc/timezone&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;/home/seata/data/resources:/seata-server/resources&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>5、编辑seata的application.yml配置文件，路径为第2步copy出来的位置</strong></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">7091</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">seata-server</span></span><br><span class="line"></span><br><span class="line"><span class="attr">logging:</span></span><br><span class="line">  <span class="attr">config:</span> <span class="string">classpath:logback-spring.xml</span></span><br><span class="line">  <span class="attr">file:</span></span><br><span class="line">    <span class="attr">path:</span> <span class="string">$&#123;user.home&#125;/logs/seata</span></span><br><span class="line">  <span class="attr">extend:</span></span><br><span class="line">    <span class="attr">logstash-appender:</span></span><br><span class="line">      <span class="attr">destination:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:4560</span></span><br><span class="line">    <span class="attr">kafka-appender:</span></span><br><span class="line">      <span class="attr">bootstrap-servers:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:9092</span></span><br><span class="line">      <span class="attr">topic:</span> <span class="string">logback_to_logstash</span></span><br><span class="line"></span><br><span class="line"><span class="attr">console:</span></span><br><span class="line">  <span class="attr">user:</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">seata</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">seata</span></span><br><span class="line"></span><br><span class="line"><span class="attr">seata:</span></span><br><span class="line">  <span class="attr">config:</span></span><br><span class="line">    <span class="comment"># support: nacos, consul, apollo, zk, etcd3</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">nacos</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">      <span class="attr">group:</span> <span class="string">DEFAULT_GROUP</span></span><br><span class="line">      <span class="attr">username:</span></span><br><span class="line">      <span class="attr">password:</span></span><br><span class="line">      <span class="attr">data-id:</span> <span class="string">seataServer.properties</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">registry:</span></span><br><span class="line">    <span class="comment"># support: nacos, eureka, redis, zk, consul, etcd3, sofa</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">nacos</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">application:</span> <span class="string">seata-server</span></span><br><span class="line">      <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">      <span class="attr">group:</span> <span class="string">DEFAULT_GROUP</span></span><br><span class="line">      <span class="comment"># tc集群名称</span></span><br><span class="line">      <span class="attr">cluster:</span> <span class="string">default</span></span><br><span class="line">      <span class="attr">username:</span></span><br><span class="line">      <span class="attr">password:</span></span><br><span class="line"><span class="comment">#  server:</span></span><br><span class="line"><span class="comment">#    service-port: 8091 #If not configured, the default is &#x27;$&#123;server.port&#125; + 1000&#x27;</span></span><br><span class="line">  <span class="attr">security:</span></span><br><span class="line">    <span class="attr">secretKey:</span> <span class="string">SeataSecretKey0c382ef121d778043159209298fd40bf3850a017</span></span><br><span class="line">    <span class="attr">tokenValidityInMilliseconds:</span> <span class="number">1800000</span></span><br><span class="line">    <span class="attr">ignore:</span></span><br><span class="line">      <span class="attr">urls:</span> <span class="string">/,/**/*.css,/**/*.js,/**/*.html,/**/*.map,/**/*.svg,/**/*.png,/**/*.ico,/console-fe/public/**,/api/v1/auth/login</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>此配置文件的大致意思为：</strong></p>
+<ol>
+<li>使用nacos作为服务的注册中心</li>
+<li>使用nacos作为服务配置中心</li>
+</ol>
+<p>PS：因此需要先提前搭建好nacos服务</p>
+<p><strong>6、创建seata的配置文件并上传到nacos中</strong></p>
+<p>文件名称为：<strong>seataServer.properties</strong></p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">store.mode</span>=<span class="string">db</span></span><br><span class="line"><span class="comment">#-----db-----</span></span><br><span class="line"><span class="meta">store.db.datasource</span>=<span class="string">druid</span></span><br><span class="line"><span class="meta">store.db.dbType</span>=<span class="string">mysql</span></span><br><span class="line"><span class="comment"># 需要根据mysql的版本调整driverClassName</span></span><br><span class="line"><span class="comment"># mysql8及以上版本对应的driver：com.mysql.cj.jdbc.Driver</span></span><br><span class="line"><span class="comment"># mysql8以下版本的driver：com.mysql.jdbc.Driver</span></span><br><span class="line"><span class="meta">store.db.driverClassName</span>=<span class="string">com.mysql.cj.jdbc.Driver</span></span><br><span class="line"><span class="meta">store.db.url</span>=<span class="string">jdbc:mysql://127.0.0.1:3306/seata?useUnicode=true&amp;characterEncoding=utf8&amp;connectTimeout=1000&amp;socketTimeout=3000&amp;autoReconnect=true&amp;useSSL=false</span></span><br><span class="line"><span class="meta">store.db.user</span>= <span class="string">用户名</span></span><br><span class="line"><span class="meta">store.db.password</span>=<span class="string">密码</span></span><br><span class="line"><span class="comment"># 数据库初始连接数</span></span><br><span class="line"><span class="meta">store.db.minConn</span>=<span class="string">1</span></span><br><span class="line"><span class="comment"># 数据库最大连接数</span></span><br><span class="line"><span class="meta">store.db.maxConn</span>=<span class="string">20</span></span><br><span class="line"><span class="comment"># 获取连接时最大等待时间 默认5000，单位毫秒</span></span><br><span class="line"><span class="meta">store.db.maxWait</span>=<span class="string">5000</span></span><br><span class="line"><span class="comment"># 全局事务表名 默认global_table</span></span><br><span class="line"><span class="meta">store.db.globalTable</span>=<span class="string">global_table</span></span><br><span class="line"><span class="comment"># 分支事务表名 默认branch_table</span></span><br><span class="line"><span class="meta">store.db.branchTable</span>=<span class="string">branch_table</span></span><br><span class="line"><span class="comment"># 全局锁表名 默认lock_table</span></span><br><span class="line"><span class="meta">store.db.lockTable</span>=<span class="string">lock_table</span></span><br><span class="line"><span class="comment"># 查询全局事务一次的最大条数 默认100</span></span><br><span class="line"><span class="meta">store.db.queryLimit</span>=<span class="string">100</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># undo保留天数 默认7天,log_status=1（附录3）和未正常清理的undo</span></span><br><span class="line"><span class="meta">server.undo.logSaveDays</span>=<span class="string">7</span></span><br><span class="line"><span class="comment"># undo清理线程间隔时间 默认86400000，单位毫秒</span></span><br><span class="line"><span class="meta">server.undo.logDeletePeriod</span>=<span class="string">86400000</span></span><br><span class="line"><span class="comment"># 二阶段提交重试超时时长 单位ms,s,m,h,d,对应毫秒,秒,分,小时,天,默认毫秒。默认值-1表示无限重试</span></span><br><span class="line"><span class="comment"># 公式: timeout&gt;=now-globalTransactionBeginTime,true表示超时则不再重试</span></span><br><span class="line"><span class="comment"># 注: 达到超时时间后将不会做任何重试,有数据不一致风险,除非业务自行可校准数据,否者慎用</span></span><br><span class="line"><span class="meta">server.maxCommitRetryTimeout</span>=<span class="string">-1</span></span><br><span class="line"><span class="comment"># 二阶段回滚重试超时时长</span></span><br><span class="line"><span class="meta">server.maxRollbackRetryTimeout</span>=<span class="string">-1</span></span><br><span class="line"><span class="comment"># 二阶段提交未完成状态全局事务重试提交线程间隔时间 默认1000，单位毫秒</span></span><br><span class="line"><span class="meta">server.recovery.committingRetryPeriod</span>=<span class="string">1000</span></span><br><span class="line"><span class="comment"># 二阶段异步提交状态重试提交线程间隔时间 默认1000，单位毫秒</span></span><br><span class="line"><span class="meta">server.recovery.asynCommittingRetryPeriod</span>=<span class="string">1000</span></span><br><span class="line"><span class="comment"># 二阶段回滚状态重试回滚线程间隔时间  默认1000，单位毫秒</span></span><br><span class="line"><span class="meta">server.recovery.rollbackingRetryPeriod</span>=<span class="string">1000</span></span><br><span class="line"><span class="comment"># 超时状态检测重试线程间隔时间 默认1000，单位毫秒，检测出超时将全局事务置入回滚会话管理器</span></span><br><span class="line"><span class="meta">server.recovery.timeoutRetryPeriod</span>=<span class="string">1000</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>7、创建seata库的表结构</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- -------------------------------- The script used when storeMode is &#x27;db&#x27; --------------------------------</span></span><br><span class="line"><span class="comment">-- the table to store GlobalSession data</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> IF <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> `global_table`</span><br><span class="line">(</span><br><span class="line">    `xid`                       <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    `transaction_id`            <span class="type">BIGINT</span>,</span><br><span class="line">    `status`                    TINYINT      <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    `application_id`            <span class="type">VARCHAR</span>(<span class="number">32</span>),</span><br><span class="line">    `transaction_service_group` <span class="type">VARCHAR</span>(<span class="number">32</span>),</span><br><span class="line">    `transaction_name`          <span class="type">VARCHAR</span>(<span class="number">128</span>),</span><br><span class="line">    `timeout`                   <span class="type">INT</span>,</span><br><span class="line">    `begin_time`                <span class="type">BIGINT</span>,</span><br><span class="line">    `application_data`          <span class="type">VARCHAR</span>(<span class="number">2000</span>),</span><br><span class="line">    `gmt_create`                DATETIME,</span><br><span class="line">    `gmt_modified`              DATETIME,</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (`xid`),</span><br><span class="line">    KEY `idx_status_gmt_modified` (`status` , `gmt_modified`),</span><br><span class="line">    KEY `idx_transaction_id` (`transaction_id`)</span><br><span class="line">) ENGINE <span class="operator">=</span> InnoDB</span><br><span class="line">  <span class="keyword">DEFAULT</span> CHARSET <span class="operator">=</span> utf8mb4;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- the table to store BranchSession data</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> IF <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> `branch_table`</span><br><span class="line">(</span><br><span class="line">    `branch_id`         <span class="type">BIGINT</span>       <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    `xid`               <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    `transaction_id`    <span class="type">BIGINT</span>,</span><br><span class="line">    `resource_group_id` <span class="type">VARCHAR</span>(<span class="number">32</span>),</span><br><span class="line">    `resource_id`       <span class="type">VARCHAR</span>(<span class="number">256</span>),</span><br><span class="line">    `branch_type`       <span class="type">VARCHAR</span>(<span class="number">8</span>),</span><br><span class="line">    `status`            TINYINT,</span><br><span class="line">    `client_id`         <span class="type">VARCHAR</span>(<span class="number">64</span>),</span><br><span class="line">    `application_data`  <span class="type">VARCHAR</span>(<span class="number">2000</span>),</span><br><span class="line">    `gmt_create`        DATETIME(<span class="number">6</span>),</span><br><span class="line">    `gmt_modified`      DATETIME(<span class="number">6</span>),</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (`branch_id`),</span><br><span class="line">    KEY `idx_xid` (`xid`)</span><br><span class="line">) ENGINE <span class="operator">=</span> InnoDB</span><br><span class="line">  <span class="keyword">DEFAULT</span> CHARSET <span class="operator">=</span> utf8mb4;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- the table to store lock data</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> IF <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> `lock_table`</span><br><span class="line">(</span><br><span class="line">    `row_key`        <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    `xid`            <span class="type">VARCHAR</span>(<span class="number">128</span>),</span><br><span class="line">    `transaction_id` <span class="type">BIGINT</span>,</span><br><span class="line">    `branch_id`      <span class="type">BIGINT</span>       <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    `resource_id`    <span class="type">VARCHAR</span>(<span class="number">256</span>),</span><br><span class="line">    `table_name`     <span class="type">VARCHAR</span>(<span class="number">32</span>),</span><br><span class="line">    `pk`             <span class="type">VARCHAR</span>(<span class="number">36</span>),</span><br><span class="line">    `status`         TINYINT      <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;0:locked ,1:rollbacking&#x27;</span>,</span><br><span class="line">    `gmt_create`     DATETIME,</span><br><span class="line">    `gmt_modified`   DATETIME,</span><br><span class="line">    <span class="keyword">PRIMARY</span> KEY (`row_key`),</span><br><span class="line">    KEY `idx_status` (`status`),</span><br><span class="line">    KEY `idx_branch_id` (`branch_id`),</span><br><span class="line">    KEY `idx_xid` (`xid`)</span><br><span class="line">) ENGINE <span class="operator">=</span> InnoDB</span><br><span class="line">  <span class="keyword">DEFAULT</span> CHARSET <span class="operator">=</span> utf8mb4;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> IF <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> `distributed_lock`</span><br><span class="line">(</span><br><span class="line">    `lock_key`       <span class="type">CHAR</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    `lock_value`     <span class="type">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">    `expire`         <span class="type">BIGINT</span>,</span><br><span class="line">    <span class="keyword">primary</span> key (`lock_key`)</span><br><span class="line">) ENGINE <span class="operator">=</span> InnoDB</span><br><span class="line">  <span class="keyword">DEFAULT</span> CHARSET <span class="operator">=</span> utf8mb4;</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> `distributed_lock` (lock_key, lock_value, expire) <span class="keyword">VALUES</span> (<span class="string">&#x27;AsyncCommitting&#x27;</span>, <span class="string">&#x27; &#x27;</span>, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> `distributed_lock` (lock_key, lock_value, expire) <span class="keyword">VALUES</span> (<span class="string">&#x27;RetryCommitting&#x27;</span>, <span class="string">&#x27; &#x27;</span>, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> `distributed_lock` (lock_key, lock_value, expire) <span class="keyword">VALUES</span> (<span class="string">&#x27;RetryRollbacking&#x27;</span>, <span class="string">&#x27; &#x27;</span>, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> `distributed_lock` (lock_key, lock_value, expire) <span class="keyword">VALUES</span> (<span class="string">&#x27;TxTimeoutCheck&#x27;</span>, <span class="string">&#x27; &#x27;</span>, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>8、启动seata服务</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<p>自此Seata的服务端已经全部搭建完成，上面教程给出的是 <strong>nacos+db</strong> 方式部署。当然也可以选择<strong>无nacos、无db</strong>方式部署，更为简单但不那么稳定，可能会出现事务丢失情况。</p>
+<p>具体配置相关可参考官方文档：<a target="_blank" rel="noopener" href="https://seata.apache.org/zh-cn/docs/ops/deploy-by-docker-compose">https://seata.apache.org/zh-cn/docs/ops/deploy-by-docker-compose</a></p>
+<h2 id="配置Seata客户端"><a href="#配置Seata客户端" class="headerlink" title="配置Seata客户端"></a>配置Seata客户端</h2><p>客户端就比较简单分为以下几点</p>
+<p><strong>1、服务端项目需要注册到nacos注册中心且和seata共用一个中心</strong></p>
+<p><strong>2、引入seata的maven依赖</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-seata<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>3、配置application.properties相关配置</strong></p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用默认nacos组，注意和seata服务端配置保持一致</span></span><br><span class="line"><span class="meta">seata.config.nacos.group</span>=<span class="string">DEFAULT_GROUP</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>4、在需要使用分布式事务的地方加上注解 @GlobalTransactional</strong></p>
+<h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>至此分布式事务seata已经全部搭建完成。</p>
+<p>详情实战可参考项目：<a target="_blank" rel="noopener" href="https://github.com/Snykta/forge-fast-cloud">https://github.com/Snykta/forge-fast-cloud</a> （一个可快速开始的SpringCloud微服务脚手架）</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/archives/24052908.html" rel="next" title="Logback+Fluentbit+Openobserve实现日志收集">
+                <i class="fa fa-chevron-left"></i> Logback+Fluentbit+Openobserve实现日志收集
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/archives/20240602001.html" rel="prev" title="使用docker-compose方式部署nacos">
+                使用docker-compose方式部署nacos <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="十七" />
+            
+              <p class="site-author-name" itemprop="name">十七</p>
+              <p class="site-description motion-element" itemprop="description">长亭外</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">文章</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E4%B8%BA%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1"><span class="nav-number">2.</span> <span class="nav-text">何为数据库事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E4%B8%BA%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1"><span class="nav-number">3.</span> <span class="nav-text">何为分布式事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E4%B8%BASeata"><span class="nav-number">4.</span> <span class="nav-text">何为Seata</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2Seata%E6%9C%8D%E5%8A%A1%E7%AB%AF"><span class="nav-number">5.</span> <span class="nav-text">部署Seata服务端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AESeata%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">6.</span> <span class="nav-text">配置Seata客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%A8%80"><span class="nav-number">7.</span> <span class="nav-text">结言</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 - <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">十七</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
