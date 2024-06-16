@@ -80,14 +80,14 @@
 <meta property="og:url" content="https://charones.com/archives/20240602001.html">
 <meta property="og:site_name" content="十七&#39;s Blog">
 <meta property="og:locale">
-<meta property="og:image" content="https://image.charones.com/2024/05/202405292207787.jpg">
+<meta property="og:image" content="https://image.charones.com/2024/06/20240616003.jpg">
 <meta property="article:published_time" content="2024-06-02T10:00:00.000Z">
-<meta property="article:modified_time" content="2024-06-03T04:03:20.215Z">
+<meta property="article:modified_time" content="2024-06-16T11:39:25.104Z">
 <meta property="article:author" content="十七">
 <meta property="article:tag" content="Docker">
 <meta property="article:tag" content="SpringCloud">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://image.charones.com/2024/05/202405292207787.jpg">
+<meta name="twitter:image" content="https://image.charones.com/2024/06/20240616003.jpg">
 
 
 
@@ -422,15 +422,16 @@
       
 
       
-        <p><img src="https://image.charones.com/2024/05/202405292207787.jpg"></p>
+        <p><img src="https://image.charones.com/2024/06/20240616003.jpg"></p>
 <span id="more"></span>
 
 <h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><p><strong>1、docker-compose.yml 代码</strong></p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">nacos-server:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">nacos/nacos-server:v2.2.3</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">nacos-server</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8848:8848&quot;</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">MODE=standalone</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nacos/data/logs:/home/nacos/logs</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nacos/data/nacos_data:/home/nacos/data</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">nacos-server:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">nacos/nacos-server:v2.2.3</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">nacos-server</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8848:8848&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;9848:9848&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;9849:9849&quot;</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">MODE=standalone</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nacos/data/logs:/home/nacos/logs</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nacos/data/nacos_data:/home/nacos/data</span></span><br></pre></td></tr></table></figure>
 
-<p>2、运行容器</p>
+<p><strong>2、运行容器</strong></p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose -up -d</span><br></pre></td></tr></table></figure>
 
+<p><strong>PS：Nacos的2.2.3版本，需要多开放9848、9849端口，否则在新的SpringCloud中会出现连接报错。</strong></p>
 <h2 id="结言"><a href="#结言" class="headerlink" title="结言"></a>结言</h2><p>非常简单，已部署完毕。</p>
 <p>更多详细配置可参考官方文档：<a target="_blank" rel="noopener" href="https://nacos.io/zh-cn/docs/v2/quickstart/quick-start.html">https://nacos.io/zh-cn/docs/v2/quickstart/quick-start.html</a></p>
 
@@ -470,6 +471,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/archives/202406160001.html" rel="prev" title="使用docker-compose方式部署mysql">
+                使用docker-compose方式部署mysql <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -550,7 +555,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">文章</span>
                 </a>
               </div>
